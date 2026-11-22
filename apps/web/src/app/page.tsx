@@ -1,4 +1,5 @@
 import { Suspense, type ReactNode } from 'react'
+import Link from 'next/link'
 import { HomeFeed } from '@/components/home-feed'
 import { HomeCta, type HomePrice } from '@/components/home-cta'
 import { PriceStack } from '@/components/price-stack'
@@ -189,6 +190,18 @@ function Hero() {
             <br className="hidden sm:block" /> 저렴한 비용으로 <b className="font-semibold text-ink">만족도 높은 퀄리티</b>와{' '}
             <b className="font-semibold text-ink">빠른 제작기간</b>을 보장합니다.
           </p>
+
+          <Link
+            href="/marketing"
+            className="group mt-5 block w-fit border-l-2 border-plum pl-4 text-sm leading-relaxed focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-plum"
+          >
+            <span className="block font-semibold text-plum group-hover:underline group-hover:underline-offset-4">
+              홈페이지 제작 후 SNS 콘텐츠 마케팅 대행까지 가능합니다 <span aria-hidden="true">→</span>
+            </span>
+            <span className="mt-0.5 block text-ink-soft">
+              직접 선택한 가상 모델이 여러분의 매장과 브랜드를 홍보해 드립니다.
+            </span>
+          </Link>
 
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
             <AboutInquiryButton

@@ -6,14 +6,26 @@
 
 export type CareerPart = { text: string; href?: string }
 
-const LINK = /\[([^\]\n]{1,200})\]\((https?:\/\/[^\s()]{1,500})\)/g
+/* 줄바꿈이나 대괄호가 든 글자는 [글자](<주소>)로 저장한다.
+   그 형식에서만 이스케이프를 풀어, 기존 링크의 역슬래시는 그대로 표시한다. */
+const LINK = /\[((?:\\[\\[\]]|[^[\]\\]){1,200})\]\(<(https?:\/\/[^\s()<>]{1,500})>\)|\[([^\]\n]{1,200})\]\((https?:\/\/[^\s()]{1,500})\)/g
+
+export function careerLink(text: string, href: string): string {
+  if (!/[[\]\n]/.test(text)) return `[${text}](${href})`
+  return `[${text.replace(/[\\[\]]/g, '\\$&')}](<${href}>)`
+}
+
+export function overlapsCareerLink(text: string, start: number, end: number): boolean {
+  return Array.from(text.matchAll(LINK)).some((m) => start < m.index + m[0].length && end > m.index)
+}
 
 export function splitCareer(text: string): CareerPart[] {
   const parts: CareerPart[] = []
   let at = 0
   for (const m of text.matchAll(LINK)) {
     if (m.index > at) parts.push({ text: text.slice(at, m.index) })
-    parts.push({ text: m[1]!, href: m[2]! })
+    const [, escaped, extendedHref, plain, plainHref] = m
+    parts.push({ text: escaped === undefined ? plain : escaped.replace(/\\([\\[\]])/g, '$1'), href: extendedHref ?? plainHref })
     at = m.index + m[0].length
   }
   if (at < text.length) parts.push({ text: text.slice(at) })

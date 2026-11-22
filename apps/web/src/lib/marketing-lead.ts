@@ -1,5 +1,6 @@
-/* 마케팅 대행 "출시 소식 받기" 접수 — 화면(marketing-lead-modal.tsx)과 접수 API(/api/marketing-lead)가 같이 쓴다.
-   DB 는 0036_marketing_leads.sql. 길이 한도는 그 파일의 check 제약과 같다. */
+/* 마케팅 문의 폼과 접수 API가 쓰는 값. 길이 한도는 DB 제약과 같다. */
+
+export const MARKETING_MESSAGE_MAX = 2000
 
 export const MARKETING_INDUSTRIES = [
   '음식점 · 고깃집 · 분식',
@@ -14,10 +15,10 @@ export const MARKETING_INDUSTRIES = [
 ] as const
 
 export const LEAD_URL_FIELDS = [
-  { name: 'homepageUrl', column: 'homepage_url', label: '회사 홈페이지', placeholder: 'https://example.com' },
-  { name: 'naverPlaceUrl', column: 'naver_place_url', label: '네이버 플레이스', placeholder: 'https://naver.me/…' },
-  { name: 'instagramUrl', column: 'instagram_url', label: '인스타그램', placeholder: 'https://instagram.com/…' },
-  { name: 'youtubeUrl', column: 'youtube_url', label: '유튜브', placeholder: 'https://youtube.com/@…' },
+  { name: 'homepageUrl', column: 'homepage_url', label: '회사 홈페이지' },
+  { name: 'naverPlaceUrl', column: 'naver_place_url', label: '네이버 플레이스' },
+  { name: 'instagramUrl', column: 'instagram_url', label: '인스타그램' },
+  { name: 'youtubeUrl', column: 'youtube_url', label: '유튜브' },
 ] as const
 
 export const LEAD_URL_MAX = 500

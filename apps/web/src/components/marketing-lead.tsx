@@ -1,12 +1,10 @@
 'use client'
 
-import { useRef, useState, type FormEvent, type ReactNode } from 'react'
+import { useRef, useState, type FormEvent } from 'react'
 import { Consent, Dialog, Done, Field, inputCls } from './inquiry/form-bits'
-import { LEAD_URL_FIELDS, MARKETING_INDUSTRIES, normalizeUrl } from '@/lib/marketing-lead'
+import { MARKETING_INDUSTRIES, MARKETING_MESSAGE_MAX } from '@/lib/marketing-lead'
 
-/* 마케팅 페이지의 '출시 소식 받기' — 버튼을 누르면 문의 폼이 열리고 /api/marketing-lead 로 보낸다.
-   className: 색만 바꾼다(모양·크기는 AboutInquiryButton 과 같다) */
-export function MarketingLeadButton({ className, children }: { className?: string; children?: ReactNode }) {
+export function MarketingLeadButton({ className }: { className?: string }) {
   const [open, setOpen] = useState(false)
   return (
     <>
@@ -15,7 +13,7 @@ export function MarketingLeadButton({ className, children }: { className?: strin
         onClick={() => setOpen(true)}
         className={`group inline-flex min-h-12 items-center justify-center gap-4 border px-6 py-3 text-sm font-semibold tracking-[-0.01em] transition-colors focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-plum ${className ?? 'border-ink bg-ink text-paper'}`}
       >
-        {children ?? '출시 소식 받기'}
+        문의하기
         <span aria-hidden="true" className="transition-transform group-hover:translate-x-1 motion-reduce:transform-none">→</span>
       </button>
       {open && <MarketingLeadModal onClose={() => setOpen(false)} />}
@@ -27,16 +25,12 @@ function MarketingLeadModal({ onClose }: { onClose: () => void }) {
   const [sending, setSending] = useState(false)
   const [error, setError] = useState('')
   const [done, setDone] = useState(false)
-  /* 주소 칸별로 잘못 적었는지 — 누르기 전에 칸 옆에 알리고 보내기를 막는다 */
-  const [urls, setUrls] = useState<Record<string, string>>({})
   /* 같은 접수를 두 번 저장하지 않게 — 렌더 중이 아니라 처음 보낼 때 만든다 */
   const submitKey = useRef<string | null>(null)
 
-  const badUrls = LEAD_URL_FIELDS.filter((f) => normalizeUrl(urls[f.name] ?? '') === false).map((f) => f.name)
-
   async function send(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    if (sending || badUrls.length) return
+    if (sending) return
     setSending(true)
     setError('')
     try {
@@ -61,8 +55,8 @@ function MarketingLeadModal({ onClose }: { onClose: () => void }) {
     <Dialog eyebrow="MARKETING" title="문의하기" onClose={onClose}>
       {done ? (
         <Done
-          title="신청이 접수되었습니다"
-          body="출시되면 입력하신 연락처로 가장 먼저 알려 드리고, 업종에 어울리는 AI 모델도 추천해 드릴게요."
+          title="문의가 접수되었습니다"
+          body="문의 내용을 확인하고 입력하신 연락처로 안내해 드리겠습니다."
           onClose={onClose}
         />
       ) : (
@@ -77,14 +71,14 @@ function MarketingLeadModal({ onClose }: { onClose: () => void }) {
           />
 
           <div className="grid gap-6 md:grid-cols-2">
-            <Field label="회사명" req>
-              <input required name="company" maxLength={100} autoComplete="organization" className={inputCls} placeholder="가게·회사 이름" />
-            </Field>
-            <Field label="담당자명" req>
-              <input required name="contactName" maxLength={100} autoComplete="name" className={inputCls} placeholder="홍길동" />
+            <Field label="회사명(성함)" req>
+              <input required name="company" maxLength={100} className={inputCls} placeholder="회사명 또는 성함" />
             </Field>
             <Field label="연락처" req>
-              <input required name="phone" type="tel" maxLength={40} autoComplete="tel" inputMode="tel" className={inputCls} placeholder="010-0000-0000" />
+              <input required name="phone" type="tel" maxLength={40} autoComplete="tel" className={inputCls} placeholder="010-0000-0000" />
+            </Field>
+            <Field label="지역" req>
+              <input required name="region" maxLength={50} className={inputCls} placeholder="시, 군, 구까지만 적어주셔도 됩니다." />
             </Field>
             <Field label="업종" req>
               <select required name="industry" defaultValue="" className={`${inputCls} invalid:text-neutral-400`}>
@@ -98,37 +92,12 @@ function MarketingLeadModal({ onClose }: { onClose: () => void }) {
                 ))}
               </select>
             </Field>
-            <div className="md:col-span-2">
-              <Field label="소재지" req>
-                <input required name="region" maxLength={50} autoComplete="off" className={inputCls} placeholder="시, 군, 구까지만 입력해주세요 (예: 서울 강남구)" />
-              </Field>
-            </div>
           </div>
 
-          <div className="mt-10 border-t border-neutral-200 pt-6">
-            <p className="text-sm font-semibold">추가 입력 사항</p>
-            <p className="mt-1 text-xs text-neutral-500">운영 중인 채널을 알려 주시면 더 잘 맞는 AI 모델을 추천해 드릴 수 있어요.</p>
-            <div className="mt-5 grid gap-6 md:grid-cols-2">
-              {LEAD_URL_FIELDS.map((f) => {
-                const bad = badUrls.includes(f.name)
-                return (
-                  <Field key={f.name} label={f.label}>
-                    <input
-                      name={f.name}
-                      inputMode="url"
-                      autoComplete="url"
-                      maxLength={500}
-                      value={urls[f.name] ?? ''}
-                      onChange={(e) => setUrls((u) => ({ ...u, [f.name]: e.target.value }))}
-                      aria-invalid={bad}
-                      className={`${inputCls} ${bad ? 'border-red-500 focus:border-red-600' : ''}`}
-                      placeholder={f.placeholder}
-                    />
-                    {bad && <span className="mt-1 block text-xs text-red-600">주소 형식을 확인해 주세요.</span>}
-                  </Field>
-                )
-              })}
-            </div>
+          <div className="mt-6">
+            <Field label="문의내용">
+              <textarea name="message" rows={3} maxLength={MARKETING_MESSAGE_MAX} className={inputCls} placeholder="궁금한 점이나 진행하고 싶은 내용을 적어 주세요." />
+            </Field>
           </div>
 
           <Consent />
@@ -141,10 +110,10 @@ function MarketingLeadModal({ onClose }: { onClose: () => void }) {
 
           <button
             type="submit"
-            disabled={sending || badUrls.length > 0}
+            disabled={sending}
             className="mt-6 w-full rounded-lg bg-neutral-900 py-3.5 text-sm font-semibold text-white transition hover:bg-[#C93A0C] disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {sending ? '보내는 중…' : '출시 소식 신청하기'}
+            {sending ? '보내는 중…' : '문의 보내기'}
           </button>
         </form>
       )}

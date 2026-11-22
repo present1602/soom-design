@@ -51,9 +51,7 @@ export function Navbar({ menus }: { menus?: Partial<SiteMenus> | null }) {
               )
             })}
 
-            {/* 마케팅 대행 — 준비 중인 새 서비스. 글자색은 다른 메뉴와 같은 회색으로 두고(색을 바꾸면
-                이 메뉴만 '선택된' 것처럼 보인다), 옅은 테두리만 둘러 작은 단추처럼 살짝 구분한다.
-                어드민 메뉴 설정(site_menus)에는 없다 — 그 표의 key 제약이 about·explore·faq 만 받는다. */}
+            {/* 마케팅 대행 링크는 옅은 테두리로 다른 메뉴와 구분한다. */}
             <Link
               href="/marketing"
               aria-current={pathname === '/marketing' ? 'page' : undefined}
@@ -61,8 +59,7 @@ export function Navbar({ menus }: { menus?: Partial<SiteMenus> | null }) {
                 pathname === '/marketing' ? 'border-ink/40 font-medium text-ink' : 'border-line text-ink-soft hover:border-ink/30 hover:text-ink'
               }`}
             >
-              마케팅대행
-              <span className="text-[10px] font-medium tracking-[0.08em] text-ink-faint">SOON</span>
+              마케팅 대행
             </Link>
 
             {/* 가장 하고 싶은 일 — 유일하게 색을 채운 버튼으로 둔다.

@@ -7,7 +7,7 @@ import { useActionTransition } from '@/lib/use-action-transition'
 import { dateTime } from '@/lib/format-date'
 import { shrinkAvatar, shrinkImage } from '@/lib/shrink-image'
 import { shrinkPdf } from '@/lib/shrink-pdf'
-import { normalizeUrl, splitCareer } from '@/lib/career-links'
+import { careerLink, normalizeUrl, overlapsCareerLink, splitCareer } from '@/lib/career-links'
 import { CareerText } from '@/components/career-text'
 import {
   DEFAULT_EXPIRE_DAYS,
@@ -728,10 +728,12 @@ function CareerEditor({ value, onChange }: { value: string; onChange: (next: str
   const begin = () => {
     const el = ref.current
     if (!el) return
-    const { selectionStart: start, selectionEnd: end } = el
-    const text = value.slice(start, end)
-    if (start === end || !text.trim()) return setHint('링크를 걸 글자를 먼저 드래그해서 골라 주세요.')
-    if (/[\[\]\n]/.test(text)) return setHint('한 줄 안의 글자만 고를 수 있습니다. ([ ] 기호는 빼고 골라 주세요)')
+    const raw = value.slice(el.selectionStart, el.selectionEnd)
+    const text = raw.trim()
+    if (!text) return setHint('링크를 걸 글자를 먼저 드래그해서 골라 주세요.')
+    const start = el.selectionStart + raw.length - raw.trimStart().length
+    const end = start + text.length
+    if (overlapsCareerLink(value, start, end)) return setHint('이미 링크가 걸린 부분이 포함되어 있습니다. 링크가 없는 글자를 골라 주세요.')
     if (text.length > 200) return setHint('링크 글자는 200자 이내로 골라 주세요.')
     setHint(null)
     setRange({ start, end })
@@ -740,12 +742,13 @@ function CareerEditor({ value, onChange }: { value: string; onChange: (next: str
 
   const apply = () => {
     if (!range || !fixed) return
-    const next = `${value.slice(0, range.start)}[${selected}](${fixed})${value.slice(range.end)}`
+    const linked = careerLink(selected, fixed)
+    const next = `${value.slice(0, range.start)}${linked}${value.slice(range.end)}`
     onChange(next)
     setRange(null)
     setUrl('')
     /* 감싼 자리 뒤로 커서를 옮겨 이어서 쓸 수 있게 */
-    const caret = range.start + selected.length + fixed.length + 4
+    const caret = range.start + linked.length
     requestAnimationFrame(() => {
       ref.current?.focus()
       ref.current?.setSelectionRange(caret, caret)
@@ -757,7 +760,11 @@ function CareerEditor({ value, onChange }: { value: string; onChange: (next: str
       <textarea
         ref={ref}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => {
+          onChange(e.target.value)
+          setRange(null)
+          setHint(null)
+        }}
         rows={8}
         placeholder={'예:\n2019 – 2023  ○○스튜디오 시니어 디자이너\n2016 – 2019  △△에이전시 브랜드 디자이너\n\n주요 프로젝트 — ○○ 리브랜딩, △△ 앱 UI'}
         className={`${input} h-auto py-2 leading-relaxed`}
@@ -767,14 +774,14 @@ function CareerEditor({ value, onChange }: { value: string; onChange: (next: str
         <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={begin} className={ghostButton}>
           링크 걸기
         </button>
-        {links.length > 0 && <span className="text-xs text-neutral-500">링크 {links.length}개 · [글자](주소) 꼴이 링크로 보입니다</span>}
+        {links.length > 0 && <span className="text-xs text-neutral-500">링크 {links.length}개</span>}
         {hint && <span className="text-xs text-red-600">{hint}</span>}
       </div>
 
       {range && (
         <div className="mt-2 rounded-lg bg-violet-50 p-3">
           <p className="text-xs text-violet-800">
-            <b className="font-semibold">“{selected}”</b> 에 걸 주소
+            <b className="whitespace-pre-wrap font-semibold">“{selected}”</b> 에 걸 주소
           </p>
           <div className="mt-2 flex gap-1.5">
             <input

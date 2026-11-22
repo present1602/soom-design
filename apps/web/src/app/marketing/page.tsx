@@ -2,12 +2,12 @@ import type { Metadata } from 'next'
 import { MarketingLeadButton } from '@/components/marketing-lead'
 
 export const metadata: Metadata = {
-  title: '마케팅 대행 (준비 중)',
-  description: 'AI 모델이 사장님 대신 홍보하는 숏폼·이미지 광고 마케팅 대행. 유튜브 쇼츠·인스타그램·스레드 운영까지, 곧 공개합니다.',
+  title: 'SNS 콘텐츠 마케팅 대행',
+  description: '홈페이지 제작부터 SNS 콘텐츠 마케팅 대행까지. 직접 고른 AI 가상 모델로 매장과 브랜드를 홍보하는 방법을 상담해 보세요.',
   alternates: { canonical: '/marketing' },
 }
 
-/* 마케팅 대행 — 출시 전 맛보기 페이지.
+/* 마케팅 대행 소개와 문의 접수 페이지.
 
    서비스 본체는 apps/marketing 이고, 이 페이지는 그 서비스를 알리기만 한다(코드·DB 공유 없음).
 
@@ -15,8 +15,8 @@ export const metadata: Metadata = {
    인상을 입힌다 — 굵은 고딕 제목, 주황 포인트(ACCENT), 둥근 카드, 휴대폰 모형, 어두운 모델 구역.
    사이트의 장밋빛(plum)·세리프 이탤릭은 쓰지 않는다. 색은 이 파일의 상수로만 쓴다(globals.css 를 건드리지 않음).
 
-   AI 모델은 두 명만 이름과 소개 앞부분을 보여 주고 나머지는 흐리게, 네 명은 사진·이름 없이
-   "공개 예정"으로 둔다. 모델 사진이 준비되면 MODELS 의 photo 에 넣는다(src/assets/marketing/ 에 두고 import).
+   AI 모델은 지금 모두 사진·이름 없이 "공개 예정"으로 둔다(open: false). 공개할 모델은 open 을 true 로
+   바꾸면 이름과 소개 앞부분이 보인다. 모델 사진이 준비되면 MODELS 의 photo 에 넣는다(src/assets/marketing/ 에 두고 import).
    흐린 글은 화면 읽기 프로그램에 읽히지 않게 aria-hidden 으로 감추고, 대신 "곧 전체 공개" 를 읽어 준다. */
 
 const container = 'mx-auto max-w-[1200px] px-5 md:px-10'
@@ -27,6 +27,7 @@ const ACCENT_TEXT = 'text-[#C93A0C]'
 const ACCENT_SOFT = 'bg-[#FBE7DF]'
 const DARK = 'bg-[#15171C]'
 const CARD_DARK = 'bg-[#1F232B] border-[#2E333D]'
+const inquiryButton = `rounded-xl border-[#C93A0C] ${ACCENT_BG} text-white hover:border-[#9E2D08] hover:bg-[#9E2D08]`
 
 type Model = {
   field: string
@@ -43,7 +44,7 @@ type Model = {
 const MODELS: Model[] = [
   {
     field: '필라테스 · 요가 · PT',
-    open: true,
+    open: false,
     name: '서하린',
     role: '28세 · 필라테스 강사',
     lead: '자세 교정 수업만 6년째. 거북목·골반 교정처럼 손님이 실제로 찾는 고민을 짚어 줘요.',
@@ -57,7 +58,7 @@ const MODELS: Model[] = [
   },
   {
     field: '음식점 · 고깃집 · 분식',
-    open: true,
+    open: false,
     name: '박도윤',
     role: '31세 · 동네 맛집 탐방러',
     lead: '한 입 먹고 바로 터지는 리액션이 무기. 메뉴 클로즈업으로 손님 발길을 끌어요.',
@@ -70,9 +71,6 @@ const MODELS: Model[] = [
     initial: '도',
   },
   { field: '카페 · 베이커리 · 디저트', open: false, hidden: [] },
-  { field: '네일 · 헤어 · 피부관리', open: false, hidden: [] },
-  { field: '학원 · 과외 · 교육', open: false, hidden: [] },
-  { field: '인테리어 · 리모델링', open: false, hidden: [] },
 ]
 
 const PREVIEW = [
@@ -125,7 +123,7 @@ export default function MarketingPage() {
           <div className="flex min-w-0 flex-[999_1_480px] flex-col items-start gap-6">
             <p className={`inline-flex items-center gap-2 rounded-full ${ACCENT_SOFT} px-3.5 py-1.5 text-[13px] font-bold ${ACCENT_TEXT}`}>
               <span aria-hidden="true" className={`size-1.5 rounded-full ${ACCENT_BG} motion-safe:animate-pulse`} />
-              AI 숏폼 마케팅 대행 · 준비 중
+              AI 숏폼 마케팅 대행
             </p>
             <h1 id="marketing-title" className="text-[clamp(2rem,4.6vw,3.4rem)] leading-[1.2] font-extrabold tracking-[-0.035em]">
               사장님 대신,
@@ -137,15 +135,6 @@ export default function MarketingPage() {
             <p className="max-w-[520px] text-[17px] leading-[1.75] text-[#4A4F5A]">
               쇼츠 영상과 이미지 광고를 만들고, 유튜브·인스타그램·스레드 업로드까지 대신 해 드려요. 제작도, 업로드도 대행해드려요.
             </p>
-            <div className="flex flex-wrap gap-3">
-              <MarketingLeadButton className={`rounded-xl border-[#C93A0C] ${ACCENT_BG} text-white hover:border-[#9E2D08] hover:bg-[#9E2D08]`}>출시 소식 받기</MarketingLeadButton>
-              <a
-                href="#models"
-                className="inline-flex min-h-12 items-center rounded-xl border border-[#D6D1C6] bg-white px-6 text-sm font-semibold transition hover:border-[#15171C] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#C93A0C]"
-              >
-                AI 모델 미리 보기
-              </a>
-            </div>
           </div>
 
           <div className="flex flex-[1_1_300px] justify-center">
@@ -187,12 +176,9 @@ export default function MarketingPage() {
                 직접 고르세요
               </h2>
               <p className="mt-4 text-[16px] leading-[1.75] text-[#C9CCD3]">
-                업종마다 어울리는 성격·말투·목소리를 가진 AI 모델을 준비하고 있어요. 고른 모델이 매주 같은 얼굴, 같은 목소리로 가게를 소개합니다.
+                개성있는 페르소나의 성격·목소리를 가진 AI 모델들을 준비하고 있어요. 우리 브랜드/가게를 잘 홍보해줄 가상 모델을 만나보세요. 
               </p>
             </div>
-            <p className="rounded-full border border-[#3A404B] px-4 py-2 text-[13px] text-[#DADCE1]">
-              지금은 <b className="text-white">2명</b>만 먼저 살짝 공개해요
-            </p>
           </div>
 
           <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -229,28 +215,19 @@ export default function MarketingPage() {
                 <p className="text-[15px] leading-[1.75] text-[#4A4F5A]">{c.note}</p>
               </li>
             ))}
-          </ul>
-          <p className="mt-6 text-[13px] text-[#6B707B]">스레드 성장 수치: 와이즈앱·리테일, 2026년 7월 국내 월간 사용자 798만 명(전년 대비 +29.6%)</p>
+          </ul> 
         </div>
       </section>
 
-      {/* 준비 중 */}
-      <section aria-labelledby="soon-title" className="px-5 pb-16 md:px-10 md:pb-24">
-        <div className={`mx-auto flex max-w-[1200px] flex-wrap items-center gap-10 rounded-[28px] ${ACCENT_BG} px-7 py-14 text-white md:px-14 md:py-16`}>
-          <div className="min-w-0 flex-[999_1_420px]">
-            <p className="text-[13px] font-bold tracking-[0.18em] text-white/80">MARKETING SOLUTION</p>
-            <h2 id="soon-title" className="mt-3 text-[clamp(2.6rem,7vw,5rem)] leading-[1] font-extrabold tracking-[-0.04em]">
-              COMING SOON
-            </h2>
-            <p className="mt-5 max-w-[520px] text-[16px] leading-[1.75] text-white/85">
-              SOOM 마케팅 대행 솔루션은 지금 준비 중입니다. 제작만 맡기는 방식부터 업로드·채널 운영까지 통째로 맡기는 방식까지, 곧 요금과 함께 공개할게요.
-            </p>
-          </div>
-          <div className="flex flex-[1_1_260px] flex-col items-start gap-4">
-            <p className="text-[18px] font-bold">먼저 소식을 받아 보시겠어요?</p>
-            <p className="text-[14px] leading-[1.7] text-white/85">출시할 때 가장 먼저 알려 드리고, 어울리는 AI 모델도 추천해 드릴게요.</p>
-            <MarketingLeadButton className="rounded-xl border-white bg-white text-[#15171C] hover:border-[#15171C] hover:bg-[#15171C] hover:text-white">출시 소식 받기</MarketingLeadButton>
-          </div>
+      <section aria-labelledby="marketing-inquiry-title" className={`${container} pb-14 md:pb-20`}>
+        <div className="mx-auto flex max-w-[880px] flex-col items-center rounded-3xl border border-[#EDD6CA] bg-[#FFF8F3] px-6 py-8 text-center md:px-10 md:py-10">
+          <h2 id="marketing-inquiry-title" className="text-[clamp(1.4rem,3vw,2rem)] leading-[1.3] font-bold tracking-[-0.035em] break-keep">
+            우리 매장에 맞는 SNS 마케팅
+          </h2>
+          <p className="mt-2 max-w-[35em] text-[15px] leading-[1.7] break-keep text-[#4A4F5A]">
+            홈페이지 제작부터 SNS 콘텐츠 제작과 채널 운영까지 상담해 보세요.
+          </p>
+          <MarketingLeadButton className={`${inquiryButton} mt-5`} />
         </div>
       </section>
     </main>
