@@ -34,10 +34,10 @@ export function Navbar({ menus }: { menus?: Partial<SiteMenus> | null }) {
         }`}
       >
         <div className="mx-auto flex min-h-14 max-w-[1240px] flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2 md:px-8">
-          {/* 세리프 영문 로고 + 작은 한글 이름 — 검색어로 쓰이는 '에이전시숨'을 화면 글자로도 둔다 */}
+          {/* 세리프 영문 로고 + 작은 한글 이름 — 검색어로 쓰이는 '숨디자인'을 화면 글자로도 둔다 */}
           <Link href="/" aria-label="SOOM 홈" className="flex items-baseline gap-2.5 text-ink">
             <span className="font-serif text-[1.6rem] leading-none font-semibold tracking-[0.08em]">SOOM</span>
-            <span className="hidden text-[10px] font-medium tracking-[0.14em] text-ink-faint sm:inline">에이전시숨</span>
+            <span className="hidden text-[10px] font-medium tracking-[0.14em] text-ink-faint sm:inline">숨디자인</span>
           </Link>
 
           <nav aria-label="주요 메뉴" className="ml-auto flex min-w-0 flex-wrap items-center justify-end gap-x-4 gap-y-2 sm:gap-x-8">

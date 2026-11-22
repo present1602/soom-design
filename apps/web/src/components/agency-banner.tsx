@@ -14,7 +14,7 @@ export function AgencyBanner() {
           <h2 id="agency-banner-title" className="mt-2.5 text-[clamp(1.1rem,2vw,1.45rem)] leading-[1.45] font-medium tracking-[-0.03em]">
             기업형 관리자페이지나 맞춤형 관리시스템 개발이 필요한가요?
           </h2>
-          <p className="mt-1.5 text-[13px] text-[#efe6e9]/60">개발 중심 의뢰는 에이전시숨으로 의뢰주세요.</p>
+          <p className="mt-1.5 text-[13px] text-[#efe6e9]/60">개발 중심 의뢰는 에이전시숨로 의뢰주세요.</p>
         </div>
 
         <a

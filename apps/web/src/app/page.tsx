@@ -80,7 +80,7 @@ export default function Home() {
             lede="업종과 분위기가 비슷한 작업을 먼저 살펴보고, 마음에 드는 디자이너에게 의뢰하세요."
             sideEnd
             side={
-              <ExploreLink className="group inline-flex min-h-11 items-center gap-3 border border-ink px-4 text-[13px] font-semibold text-ink transition hover:bg-ink hover:text-paper">
+              <ExploreLink className="group inline-flex min-h-11 008items-center gap-3 border border-ink px-4 text-[13px] font-semibold text-ink transition hover:bg-ink hover:text-paper">
                 디자이너 보기
                 <span aria-hidden="true" className="">→</span>
               </ExploreLink>

@@ -133,7 +133,7 @@ export default async function RosterPage({ params }: { params: Promise<{ token: 
         )}
 
         <footer className="border-t border-[#e4dbd4] pt-6 text-xs text-[#8f8385]">
-          © SOOM · 에이전시숨 — 이 페이지의 내용을 외부에 공유하지 말아 주세요.
+          © SOOM · 숨디자인 — 이 페이지의 내용을 외부에 공유하지 말아 주세요.
         </footer>
       </div>
     </main>

@@ -20,10 +20,10 @@ export function Footer() {
               <span className="serif-i text-base">by designers,</span>
             </p>
             {/* 로고는 영문 SOOM 뿐이라, 사람들이 검색창에 적는 이름 꼴
-                (에이전시숨·soom.it·숨it)을 화면 글자로 한 번 둔다 —
+                (숨디자인·soom.it·숨it)을 화면 글자로 한 번 둔다 —
                 구글은 페이지에 보이는 글자로만 검색어와 맞춰 본다 */}
             <p className="mt-2 text-[11px] text-ink-faint">
-              에이전시숨 · soom.it · 숨it — 숨 웹디자인 · 웹개발 · 홈페이지 개발
+              숨디자인 · soom.it · 숨it — 숨 웹디자인 · 웹개발 · 홈페이지 개발
             </p>
 
             <dl className="mt-5 space-y-1 text-[11px] leading-relaxed text-ink-faint">

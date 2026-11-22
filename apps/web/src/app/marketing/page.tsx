@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { AboutInquiryButton } from '@/components/about-inquiry-button'
+import { MarketingLeadButton } from '@/components/marketing-lead'
 
 export const metadata: Metadata = {
   title: '마케팅 대행 (준비 중)',
@@ -138,7 +138,7 @@ export default function MarketingPage() {
               쇼츠 영상과 이미지 광고를 만들고, 유튜브·인스타그램·스레드 업로드까지 대신 해 드려요. 제작도, 업로드도 대행해드려요.
             </p>
             <div className="flex flex-wrap gap-3">
-              <AboutInquiryButton className={`rounded-xl border-[#C93A0C] ${ACCENT_BG} text-white hover:border-[#9E2D08] hover:bg-[#9E2D08]`}>출시 소식 받기</AboutInquiryButton>
+              <MarketingLeadButton className={`rounded-xl border-[#C93A0C] ${ACCENT_BG} text-white hover:border-[#9E2D08] hover:bg-[#9E2D08]`}>출시 소식 받기</MarketingLeadButton>
               <a
                 href="#models"
                 className="inline-flex min-h-12 items-center rounded-xl border border-[#D6D1C6] bg-white px-6 text-sm font-semibold transition hover:border-[#15171C] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#C93A0C]"
@@ -249,7 +249,7 @@ export default function MarketingPage() {
           <div className="flex flex-[1_1_260px] flex-col items-start gap-4">
             <p className="text-[18px] font-bold">먼저 소식을 받아 보시겠어요?</p>
             <p className="text-[14px] leading-[1.7] text-white/85">출시할 때 가장 먼저 알려 드리고, 어울리는 AI 모델도 추천해 드릴게요.</p>
-            <AboutInquiryButton className="rounded-xl border-white bg-white text-[#15171C] hover:border-[#15171C] hover:bg-[#15171C] hover:text-white">출시 소식 받기</AboutInquiryButton>
+            <MarketingLeadButton className="rounded-xl border-white bg-white text-[#15171C] hover:border-[#15171C] hover:bg-[#15171C] hover:text-white">출시 소식 받기</MarketingLeadButton>
           </div>
         </div>
       </section>

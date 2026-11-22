@@ -34,10 +34,10 @@ const geistMono = Geist_Mono({
 /* 공유 미리보기(og:image)는 같은 폴더의 opengraph-image.png 를 Next 가 붙인다.
    이미지 주소는 절대 URL 이어야 해서 metadataBase 로 사이트 주소를 준다.
 
-   제목·설명에 한글 "에이전시숨"을 함께 적는다 — 로고는 영문 SOOM 이지만,
+   제목·설명에 한글 "숨디자인"을 함께 적는다 — 로고는 영문 SOOM 이지만,
    구글은 페이지에 없는 말로는 그 페이지를 찾아주지 않는다. 영문만 적어 두면
-   "에이전시숨"으로 검색해도 걸릴 근거가 사이트 어디에도 없다.
-   내세우는 이름은 "에이전시숨" 하나로 둔다 — "숨에이전시"를 쓰는 곳이 따로
+   "숨디자인"으로 검색해도 걸릴 근거가 사이트 어디에도 없다.
+   내세우는 이름은 "숨디자인" 하나로 둔다 — "숨에이전시"를 쓰는 곳이 따로
    있어 제목까지 그 말로 적으면 그쪽과 섞인다. 다만 그렇게 찾아오는 사람도
    있으니 아래 keywords·alternateName 에는 그 꼴도 담아 둔다.
 
@@ -46,22 +46,22 @@ const geistMono = Geist_Mono({
 /* "soom.it"·"숨it" 으로 검색해도 걸리도록 설명(검색결과 아래 문구)에도 적는다 —
    keywords 칸은 구글이 읽지 않아, 페이지에 실제로 있는 글자가 근거가 된다. */
 const DESCRIPTION =
-  "에이전시숨(SOOM · soom.it · 숨it)은 검증된 디자이너를 소액 의뢰로 먼저 만나 보고 본 계약까지 이어가는 디자이너 포트폴리오 플랫폼입니다.";
+  "숨디자인(SOOM · soom.it · 숨it)은 검증된 디자이너를 소액 의뢰로 먼저 만나 보고 본 계약까지 이어가는 디자이너 포트폴리오 플랫폼입니다.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "에이전시숨 (SOOM) · 디자이너 포트폴리오 플랫폼",
-    template: "%s · 에이전시숨 (SOOM)",
+    default: "숨디자인 (SOOM) · 디자이너 포트폴리오 플랫폼",
+    template: "%s · 숨디자인 (SOOM)",
   },
   description: DESCRIPTION,
-  applicationName: "에이전시숨",
+  applicationName: "숨디자인",
   /* 앞부분은 브랜드명을 사람들이 실제로 적어 넣는 꼴들이다 — 한글·영문,
      띄어쓰기, 'it' 을 '아이티·잇'으로 적는 경우까지 함께 담는다. 로고는
      영문 SOOM 하나지만 검색창에는 이 중 아무 꼴로나 들어온다.
      뒷부분은 브랜드를 모르는 사람이 찾을 때 쓰는 일반 말이다. */
   keywords: [
-    "에이전시숨",
+    "숨디자인",
     "에이전시 숨",
     "숨에이전시",
     "숨 에이전시",
@@ -118,13 +118,13 @@ export const metadata: Metadata = {
     type: "website",
     locale: "ko_KR",
     url: "/",
-    siteName: "에이전시숨 (SOOM)",
-    title: "에이전시숨 (SOOM) · 디자이너 포트폴리오 플랫폼",
+    siteName: "숨디자인 (SOOM)",
+    title: "숨디자인 (SOOM) · 디자이너 포트폴리오 플랫폼",
     description: "소액 의뢰로 시작해 본 계약까지.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "에이전시숨 (SOOM) · 디자이너 포트폴리오 플랫폼",
+    title: "숨디자인 (SOOM) · 디자이너 포트폴리오 플랫폼",
     description: "소액 의뢰로 시작해 본 계약까지.",
   },
   /* 운영만 검색에 열어 둔다. dev.soom.it 등은 noindex 로 못박는다 —
@@ -160,7 +160,7 @@ export const metadata: Metadata = {
 const ORG_JSON_LD = {
   "@context": "https://schema.org",
   "@type": "LocalBusiness",
-  name: "에이전시숨",
+  name: "숨디자인",
   alternateName: [
     "에이전시 숨",
     "숨에이전시",
@@ -212,7 +212,7 @@ const ORG_JSON_LD = {
 const WEBSITE_JSON_LD = {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  name: "에이전시숨",
+  name: "숨디자인",
   alternateName: ["SOOM", "soom.it", "숨it", "에이전시 숨"],
   url: `${SITE_URL}/`,
 };
