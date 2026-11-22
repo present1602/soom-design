@@ -126,11 +126,13 @@ export function Dialog({
   onClose: () => void
   children: ReactNode
 }) {
-  const sheet = useSheetDrag(onClose)
+  /* 훅이 돌려준 묶음을 바로 나눠 받는다 — 묶음째 들고 있다가 렌더 중에 sheet.xxx 로 꺼내면
+     그 묶음 안의 ref 를 렌더 중에 읽는 것으로 보여 react-hooks/refs 규칙에 걸린다 */
+  const { ref: sheetRef, slideClose, handle } = useSheetDrag(onClose)
 
   /* Esc 로 닫고, 열려 있는 동안 뒤쪽이 스크롤되지 않게 한다.
      닫는 길은 하나로 모은다 — 바깥 누름·손잡이·Esc 가 같은 모양으로 사라진다 */
-  const close = sheet.slideClose
+  const close = slideClose
   useEffect(() => {
     const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
@@ -161,11 +163,11 @@ export function Dialog({
       className="fixed inset-0 z-50 overflow-y-auto overscroll-contain bg-neutral-950/70"
       /* 바깥을 누르면 모바일에서는 시트가 아래로 미끄러지며 사라진다(slideClose) —
          그냥 사라지면 어디로 간 것인지 읽히지 않는다. 넓은 화면은 그대로 닫는다 */
-      onClick={sheet.slideClose}
+      onClick={slideClose}
     >
       <div className="flex min-h-full flex-col pt-10 md:px-8 md:py-14">
         <div
-          ref={sheet.ref}
+          ref={sheetRef}
           role="dialog"
           aria-modal="true"
           onClick={(e) => e.stopPropagation()}
@@ -182,7 +184,7 @@ export function Dialog({
               넓히고(44px 가까이), 그 칸이 손짓을 받는다.
               touch-none 이 있어야 끄는 동안 브라우저가 스크롤로 가로채지 않는다 */}
           <div
-            {...sheet.handle}
+            {...handle}
             aria-hidden
             className="flex cursor-grab touch-none items-center justify-center py-4 active:cursor-grabbing md:hidden"
           >

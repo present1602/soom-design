@@ -114,12 +114,13 @@ export function DesignerTable({ designers }: { designers: AdminDesignerListRow[]
   )
 }
 
-/* 활동 지표 넷 — 마지막 로그인 · 최근 30일 로그인 · 최근 업로드 · 포트폴리오 수 */
+/* 활동 지표 넷 — 마지막 접속 · 최근 30일 중 접속한 날 · 최근 업로드 · 포트폴리오 수.
+   접속은 로그인 상태로 스튜디오를 연 것까지 센다(designer-auth.ts recordSeen). */
 function Metrics({ activity: a }: { activity: DesignerActivity }) {
   return (
     <dl className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-neutral-500">
-      <Metric label="마지막 로그인" value={relativeDay(a.last_login_at)} />
-      <Metric label="30일 로그인" value={`${a.logins_30d}회`} dim={a.logins_30d === 0} />
+      <Metric label="마지막 접속" value={relativeDay(a.last_login_at)} />
+      <Metric label="30일 접속" value={`${a.logins_30d}일`} dim={a.logins_30d === 0} title="최근 30일 중 접속한 날 수" />
       <Metric label="최근 업로드" value={shortDate(a.last_work_at)} />
       <Metric
         label="포트폴리오"

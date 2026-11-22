@@ -1,0 +1,21 @@
+{
+  "name": "@marketing/worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --env-file-if-exists=.env.local --import tsx --watch src/index.ts",
+    "start": "node --env-file-if-exists=.env.local --import tsx src/index.ts",
+    "once": "node --env-file-if-exists=.env.local --import tsx src/index.ts --once",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.118.0",
+    "@marketing/core": "workspace:*",
+    "tsx": "^4.20.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "typescript": "^5"
+  }
+}

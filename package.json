@@ -7,6 +7,9 @@
     "build": "pnpm --filter web build",
     "lint": "pnpm --filter web lint",
     "dev:web": "pnpm --filter web dev",
-    "build:web": "pnpm --filter web build"
+    "build:web": "pnpm --filter web build",
+    "dev:marketing": "pnpm --parallel --filter @marketing/console --filter @marketing/worker dev",
+    "dev:console": "pnpm --filter @marketing/console dev",
+    "dev:worker": "pnpm --filter @marketing/worker dev"
   }
 }

@@ -1,5 +1,6 @@
 import 'server-only'
 import { cookies } from 'next/headers'
+import { after } from 'next/server'
 import { SignJWT, jwtVerify } from 'jose'
 import { hashPassword, verifyPassword } from './password'
 import { supabaseAdmin } from './supabase-admin'
@@ -78,7 +79,46 @@ export async function getDesignerUser(): Promise<DesignerRow | null> {
 
   const d = data as DesignerRow
   if (!d.visible) return null
+
+  /* 세션이 2주 유지돼서 비밀번호를 다시 넣지 않고도 계속 쓴다 — 로그인 순간만 남기면
+     어드민의 "마지막 접속"이 실제 활동보다 한참 전으로 보인다. 응답을 막지 않게 끝난 뒤 남긴다. */
+  after(() => recordSeen(d, false))
   return d
+}
+
+/* 접속 기록을 쓰는 간격. 화면을 옮길 때마다 DB 를 쓰지 않게 막는다. */
+const SEEN_EVERY_MS = 10 * 60 * 1000
+
+/* 한국 날짜(YYYY-MM-DD) — 접속일을 셀 때 하루의 경계를 자정(KST)으로 둔다 */
+function kstDay(t: number): string {
+  return new Date(t + 9 * 60 * 60 * 1000).toISOString().slice(0, 10)
+}
+
+/* 마지막 접속 시각을 갱신하고, 그날 첫 접속이면 designer_logins 에 한 줄 남긴다.
+   그래서 "30일 접속"은 최근 30일 중 접속한 날 수가 된다.
+   force 는 비밀번호 로그인 — 간격과 상관없이 시각을 새로 쓴다.
+   기록이 실패해도 사용자를 막지 않는다. */
+async function recordSeen(d: DesignerRow, force: boolean) {
+  if (!supabaseAdmin) return
+  const now = Date.now()
+  const prev = d.last_login_at ? Date.parse(d.last_login_at) : NaN
+  const hasPrev = !Number.isNaN(prev)
+  if (!force && hasPrev && now - prev < SEEN_EVERY_MS) return
+
+  /* 같은 순간 들어온 요청 둘이 모두 쓰지 않게, 읽었던 값이 그대로일 때만 갱신한다 */
+  let q = supabaseAdmin.from('designers').update({ last_login_at: new Date(now).toISOString() }).eq('id', d.id)
+  if (!force) q = d.last_login_at ? q.eq('last_login_at', d.last_login_at) : q.is('last_login_at', null)
+  const { data, error } = await q.select('id')
+  if (error) {
+    console.error('[designer] 접속 시각 기록 실패:', error.message)
+    return
+  }
+  if (!data?.length) return
+
+  if (!hasPrev || kstDay(prev) !== kstDay(now)) {
+    const { error: logErr } = await supabaseAdmin.from('designer_logins').insert({ designer_id: d.id })
+    if (logErr) console.error('[designer] 접속일 기록 실패:', logErr.message)
+  }
 }
 
 /* 비밀번호 해싱·임시 비밀번호는 password.ts 에 있다 — bcryptjs 를 페이지 그래프에
@@ -103,19 +143,7 @@ export async function signIn(
   }
 
   await createSession(d)
-
-  if (supabaseAdmin) {
-    /* 마지막 시각은 designers 에 덮어쓰고, 횟수를 세기 위해 이력도 한 줄 남긴다.
-       둘 중 하나가 실패해도 로그인은 이미 성공한 것으로 둔다 —
-       기록 때문에 사용자를 막지 않는다. */
-    await Promise.all([
-      supabaseAdmin
-        .from('designers')
-        .update({ last_login_at: new Date().toISOString() })
-        .eq('id', d.id),
-      supabaseAdmin.from('designer_logins').insert({ designer_id: d.id }),
-    ])
-  }
+  await recordSeen(d, true)
 
   return { ok: true, designer: d }
 }

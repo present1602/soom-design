@@ -1002,7 +1002,7 @@ function AccountSection({
           </dd>
         </div>
         <div className="flex gap-3">
-          <dt className="w-28 shrink-0 text-neutral-500">마지막 로그인</dt>
+          <dt className="w-28 shrink-0 text-neutral-500">마지막 접속</dt>
           <dd className="text-neutral-600">
             {d.last_login_at ? new Date(d.last_login_at).toLocaleString('ko-KR') : '기록 없음'}
           </dd>

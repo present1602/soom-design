@@ -6,9 +6,22 @@
 
    끝의 '/' 는 떼어 둔다. 붙은 채로 `${SITE_URL}/explore` 를 만들면
    '//explore' 가 되어 구글에게는 다른 주소로 보인다(중복 색인). */
-export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://soom.it').replace(/\/+$/, '')
+export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://design.soom.it').replace(/\/+$/, '')
 
-/* 검색에 내보내도 되는 곳인가 — 운영(soom.it)만 참이다.
+/* 운영 주소 목록 — 2026-11-21 부터 운영은 design.soom.it 이고 soom.it 는 에이전시로
+   리다이렉트한다. 나중에 soom.it 로 되돌릴 수 있어 둘 다 둔다. 되돌릴 때는 코드는 그대로 두고
+   Vercel 의 NEXT_PUBLIC_SITE_URL 과 Domains 만 바꾸면 된다. pre-launch.ts 도 이 목록을 본다. */
+const PRODUCTION_HOSTS = ['design.soom.it', 'soom.it', 'www.soom.it']
+
+export function isProductionHost(siteUrl: string | undefined): boolean {
+  try {
+    return PRODUCTION_HOSTS.includes(new URL(siteUrl ?? '').hostname)
+  } catch {
+    return false
+  }
+}
+
+/* 검색에 내보내도 되는 곳인가 — 운영(PRODUCTION_HOSTS)만 참이다.
 
    dev.soom.it·미리보기 배포·로컬은 운영과 내용이 같다. 그대로 열어 두면
    같은 사이트가 두 벌 색인되고, 구글이 어느 쪽을 올릴지 흐려진다(중복 콘텐츠).
@@ -19,13 +32,4 @@ export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://soom.it').
    호스트로 보면 기본값이 "막는 쪽"이라 깜빡해도 안전하다.
 
    www 도 함께 참으로 둔다 — 운영 도메인의 다른 표기일 뿐이다. */
-function indexable(): boolean {
-  try {
-    const host = new URL(SITE_URL).hostname
-    return host === 'soom.it' || host === 'www.soom.it'
-  } catch {
-    return false
-  }
-}
-
-export const INDEXABLE = indexable()
+export const INDEXABLE = isProductionHost(SITE_URL)
