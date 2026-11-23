@@ -2,7 +2,8 @@
 
 import { useRef, useState, type FormEvent } from 'react'
 import { Consent, Dialog, Done, Field, inputCls } from './inquiry/form-bits'
-import { MARKETING_INDUSTRIES, MARKETING_MESSAGE_MAX } from '@/lib/marketing-lead'
+import { MARKETING_MESSAGE_MAX } from '@/lib/marketing-lead'
+import { useIndustries } from './inquiry/use-industries'
 
 export function MarketingLeadButton({ className }: { className?: string }) {
   const [open, setOpen] = useState(false)
@@ -22,6 +23,7 @@ export function MarketingLeadButton({ className }: { className?: string }) {
 }
 
 function MarketingLeadModal({ onClose }: { onClose: () => void }) {
+  const industries = useIndustries()
   const [sending, setSending] = useState(false)
   const [error, setError] = useState('')
   const [done, setDone] = useState(false)
@@ -85,7 +87,7 @@ function MarketingLeadModal({ onClose }: { onClose: () => void }) {
                 <option value="" disabled>
                   업종을 골라 주세요
                 </option>
-                {MARKETING_INDUSTRIES.map((i) => (
+                {industries.map((i) => (
                   <option key={i} value={i} className="text-neutral-900">
                     {i}
                   </option>

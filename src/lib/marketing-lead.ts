@@ -2,17 +2,7 @@
 
 export const MARKETING_MESSAGE_MAX = 2000
 
-export const MARKETING_INDUSTRIES = [
-  '음식점 · 고깃집 · 분식',
-  '카페 · 베이커리 · 디저트',
-  '필라테스 · 요가 · PT',
-  '네일 · 헤어 · 피부관리',
-  '학원 · 과외 · 교육',
-  '인테리어 · 리모델링',
-  '병원 · 의원 · 약국',
-  '쇼핑몰 · 판매',
-  '기타',
-] as const
+/* 업종 목록은 의뢰 폼과 같이 쓴다 — lib/industries.ts, 어드민 설정 > 업종 목록 */
 
 export const LEAD_URL_FIELDS = [
   { name: 'homepageUrl', column: 'homepage_url', label: '회사 홈페이지' },

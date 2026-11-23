@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server'
 import { sendAdminMail } from '@/lib/admin-mail'
 import { allowedEmails } from '@/lib/admin-auth'
 import { supabaseAdmin, supabaseConfigured } from '@/lib/supabase-admin'
-import { LEAD_URL_FIELDS, MARKETING_INDUSTRIES, MARKETING_MESSAGE_MAX, normalizeUrl } from '@/lib/marketing-lead'
+import { LEAD_URL_FIELDS, MARKETING_MESSAGE_MAX, normalizeUrl } from '@/lib/marketing-lead'
+import { INDUSTRY_NAME_MAX } from '@/lib/industries'
 
 /* 마케팅 문의는 DB에 저장한 뒤 알림 메일을 보낸다. */
 
@@ -38,7 +39,8 @@ export async function POST(req: Request) {
     if (!company || !phone || !region || !industry) {
       return bad('회사명(성함), 연락처, 지역, 업종을 입력해 주세요.')
     }
-    if (!(MARKETING_INDUSTRIES as readonly string[]).includes(industry)) {
+    /* 목록은 어드민에서 바뀐다 — 열어 둔 폼이 예전 목록이어도 받도록 길이만 본다 */
+    if (industry.length > INDUSTRY_NAME_MAX) {
       return bad('업종을 목록에서 골라 주세요.')
     }
     /* 연락처 형식은 묶지 않는다(/api/inquiry 와 같은 방침) — 숫자가 있는지만 */

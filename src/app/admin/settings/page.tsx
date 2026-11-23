@@ -6,6 +6,7 @@ import { supabaseConfigured } from '@/lib/supabase-admin'
 import {
   getPlanCopies,
   getExploreDesc,
+  getIndustries,
   getScopePrompt,
   getShowDuration,
   listOptionTemplates,
@@ -16,6 +17,7 @@ import { PlanCopyForm } from '@/components/admin/plan-copy-form'
 import { OptionTemplateManager } from '@/components/admin/option-template-manager'
 import { SpecialtyManager } from '@/components/admin/specialty-manager'
 import { ScopePromptToggle, ShowDurationToggle } from '@/components/admin/scope-prompt-toggle'
+import { IndustryForm } from '@/components/admin/industry-form'
 
 export const metadata: Metadata = {
   title: '설정',
@@ -46,7 +48,7 @@ export default async function AdminSettingsPage(props: PageProps<'/admin/setting
 
   /* 서로 기다릴 이유가 없다. 탭마다 필요한 것만 읽는다 —
      포함 항목 템플릿 탭도 프리미엄을 켠 플랜을 알아야 해서 플랜 문구를 함께 읽는다 */
-  const [copies, specialties, scopePrompt, showDuration, templates, exploreDesc, budgetRows] =
+  const [copies, specialties, scopePrompt, showDuration, templates, exploreDesc, budgetRows, industries] =
     await Promise.all([
       tab === 'general' ? null : getPlanCopies(),
       tab === 'general' ? listAllSpecialties() : null,
@@ -56,6 +58,7 @@ export default async function AdminSettingsPage(props: PageProps<'/admin/setting
       tab === 'general' ? getExploreDesc() : null,
       /* 분야별 예산 구간(0022) — 분야 목록과 같은 탭에서만 쓴다 */
       tab === 'general' ? readBudgetRows() : null,
+      tab === 'general' ? getIndustries() : null,
     ])
 
   /* Map 은 클라이언트 컴포넌트로 넘어가지 않는다 — 평범한 객체로 바꾼다 */
@@ -108,6 +111,7 @@ export default async function AdminSettingsPage(props: PageProps<'/admin/setting
               exploreDesc={exploreDesc!}
               budgets={budgets ?? {}}
             />
+            <IndustryForm industries={industries!} />
           </>
         )}
 

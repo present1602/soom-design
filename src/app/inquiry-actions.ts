@@ -2,7 +2,7 @@
 
 import { generalChoices, type CategoryChoice } from '@/lib/inquiry-choices'
 import { listCategoryMetas } from '@/lib/specialties'
-import { getPlanCopies } from '@/lib/site-settings'
+import { getIndustries, getPlanCopies } from '@/lib/site-settings'
 import { signInquiryUpload } from '@/lib/inquiry-files'
 import { getBudgetsByCategory } from '@/lib/specialty-budgets'
 import type { BudgetsByCategory } from '@/lib/inquiry-budget'
@@ -12,6 +12,11 @@ import type { BudgetsByCategory } from '@/lib/inquiry-budget'
    읽기만 하고 공개 화면에 이미 나가는 값(노출 분야·기본 금액)만 돌려주므로
    로그인 없이 불러도 된다. 네비바·홈은 여러 페이지에 걸려 있어 서버에서
    미리 읽어 내리면 모든 페이지가 분야 표를 기다리게 된다. */
+/* 의뢰·마케팅 문의 폼의 업종 목록 — 공개 폼의 선택지라 로그인 없이 읽는다 */
+export async function getIndustryOptions(): Promise<string[]> {
+  return getIndustries()
+}
+
 export async function getGeneralInquiryChoices(): Promise<{
   choices: CategoryChoice[]
   /* 분야별 예산 구간(0022) — 구간을 둔 분야만 들어 있다 */

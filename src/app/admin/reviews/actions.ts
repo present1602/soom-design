@@ -55,7 +55,7 @@ export async function sendReviewLinkForInquiry(
   const q = inq as {
     id: string
     name: string
-    email: string
+    email: string | null
     designer_id: string | null
     designer_name: string | null
   }
@@ -79,7 +79,9 @@ export async function sendReviewLinkForInquiry(
   const url = `${siteUrl()}/review/${t.token}`
   const designerName = picked?.name ?? q.designer_name
 
-  const mail = await sendReviewRequest(q.email, q.name, url, designerName)
+  // 이메일은 선택(0038) — 없거나 '미입력'(0038 전 저장)이면 링크만 만들고 직접 전달하게 한다
+  const hasEmail = !!q.email && q.email.includes('@')
+  const mail = hasEmail ? await sendReviewRequest(q.email!, q.name, url, designerName) : { ok: false, error: '문의에 이메일이 없어요' }
   if (mail.ok) await markReviewLinkSent(t.token)
 
   revalidatePath('/admin/inquiries')

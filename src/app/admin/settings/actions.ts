@@ -18,6 +18,7 @@ import {
 } from '@/lib/plans'
 import { SCOPES, type Scope } from '@/lib/scopes'
 import { MAX_FAQ_ANSWER, MAX_FAQ_QUESTION } from '@/lib/faq-shape'
+import { cleanIndustries, INDUSTRY_MAX, INDUSTRY_NAME_MAX } from '@/lib/industries'
 import { BUDGET_LABEL_MAX, BUDGET_MAX_PER_CATEGORY } from '@/lib/inquiry-budget'
 import {
   isSpecialtyScopeMode,
@@ -172,6 +173,20 @@ function descFail(message: string, what: string) {
       ? '0002_specialty_description.sql 을 먼저 실행해 주세요.'
       : '저장에 실패했습니다.',
   )
+}
+
+/* 의뢰·마케팅 문의 폼의 업종 목록(0038). 한 줄에 하나, 적은 순서대로 보인다 */
+export async function setIndustries(text: string): Promise<Result> {
+  const db = await guard()
+  const list = cleanIndustries(text)
+  if (!list) return fail(`업종은 ${INDUSTRY_MAX}개까지, 하나에 ${INDUSTRY_NAME_MAX}자까지 적을 수 있어요.`)
+  if (!list.length) return fail('업종을 하나 이상 적어 주세요.')
+  const { error } = await db.from('site_settings').update({ industries: list }).eq('id', true)
+  if (error) {
+    return fail(error.message.includes('industries') ? 'DB에 업종 칸이 없어요. Supabase SQL Editor에서 0038_inquiry_industry_optional_message.sql 을 먼저 실행해 주세요.' : `저장에 실패했습니다: ${error.message}`)
+  }
+  revalidatePath('/admin/settings')
+  return { ok: true }
 }
 
 /* '전체'일 때 문구 */

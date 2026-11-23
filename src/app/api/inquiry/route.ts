@@ -66,6 +66,8 @@ export async function POST(req: Request) {
     const email = String(form.get('email') ?? '').trim()
     const phone = String(form.get('phone') ?? '').trim()
     const message = String(form.get('message') ?? '').trim()
+    /* 업종(선택, 0038) — 직접 적는 칸이라 길이만 막는다 */
+    const industry = String(form.get('industry') ?? '').trim().replace(/\s+/g, ' ').slice(0, 50)
     /* 분야와 범위(0003_inquiry_category.sql) — 화면이 보낸 값을 그대로 믿지 않고
        아래에서 분야 설정과 맞춰 본다. 범위는 inquiry_type 글자로 남는다 */
     const category = String(form.get('category') ?? '').trim()
@@ -84,8 +86,8 @@ export async function POST(req: Request) {
     const submitKey = String(form.get('submitKey') ?? '').trim()
     const ref = String(form.get('ref') ?? '').trim().slice(0, 40)
 
-    if (!name || !email || !phone || !message) {
-      return bad('성함, 이메일, 연락처, 문의내용은 필수입니다.')
+    if (!name || !phone) {
+      return bad('성함, 연락처는 필수입니다.')
     }
 
     /* 분야가 하나라도 있으면 분야·범위를 골라야 한다. 분야가 아예 없으면(설정 전)
@@ -129,7 +131,8 @@ export async function POST(req: Request) {
         }
       }
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    /* 이메일은 선택(0038) — 적었을 때만 형식을 본다 */
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return bad('이메일 주소를 확인해 주세요.')
     }
     /* 연락처는 형식을 묶지 않는다 — 02-123-4567, +82 10-…, 내선처럼
@@ -237,9 +240,11 @@ export async function POST(req: Request) {
     /* ── DB 저장: 여기까지 왔으면 접수는 안전하다 ── */
     const fields = {
       name,
-      email,
+      email: email || null,
       phone,
-      message,
+      /* 문의내용은 선택(0038) — 비우면 null */
+      message: message || null,
+      ...(industry ? { industry } : {}),
       inquiry_type: inquiryType,
       /* 036 전 DB 에는 칸이 없다 — 그때는 프리미엄이 공개되지 않아 값도 오지 않는다 */
       ...(planTier ? { plan_tier: planTier } : {}),
@@ -264,6 +269,13 @@ export async function POST(req: Request) {
       console.warn('[inquiry] budget 칸 없음(0021 전) — 예산 없이 저장:', budget)
       const { budget: _drop, ...rest } = fields as typeof fields & { budget?: string }
       ;({ data: row, error: dbErr } = await insert(category ? { ...rest, category } : rest))
+    }
+    /* 0038 전 DB: 업종 칸이 없고 문의내용이 필수다 — 접수를 잃지 않게 업종을 빼고, 빈 문의내용은 "미입력"으로 다시 넣는다 */
+    if (dbErr && (dbErr.message.includes('industry') || (!message && /message/.test(dbErr.message)) || (!email && /email/.test(dbErr.message)))) {
+      console.warn('[inquiry] 0038 전 DB — 업종 없이, 빈 문의내용·이메일은 "미입력"으로 저장:', industry)
+      const legacy: Record<string, unknown> = { ...fields, message: message || '미입력', email: email || '미입력' }
+      delete legacy.industry
+      ;({ data: row, error: dbErr } = await insert(category ? { ...legacy, category } : legacy))
     }
     /* 0003 전 DB 에는 category 칸이 없다 — 접수를 잃지 않게 분야 없이 다시 넣는다 */
     if (dbErr?.message.includes('category')) {
@@ -310,7 +322,7 @@ export async function POST(req: Request) {
           from: `soom 문의 <${FROM}>`,
           to,
           /* 답장을 누르면 바로 문의한 사람에게 간다 */
-          replyTo: email,
+          ...(email ? { replyTo: email } : {}),
           subject: designerName
             ? `[${typeLabel}] ${name} → ${designerName}${viaRef ? ' (초대 링크)' : ''}`
             : `[${typeLabel}] ${name}`,
@@ -319,7 +331,8 @@ export async function POST(req: Request) {
             name,
             email,
             phone,
-            message,
+            message: message || '미입력',
+            industry,
             inquiryType: typeLabel,
             /* 범위를 안 고른 간편 의뢰만 — 그때는 예산이 견적의 유일한 실마리다 */
             budget: inquiryType ? '' : (budget ?? '고르지 않음'),
@@ -352,6 +365,7 @@ function mailHtml({
   email,
   phone,
   message,
+  industry,
   inquiryType,
   budget,
   designerName,
@@ -363,6 +377,7 @@ function mailHtml({
   email: string
   phone: string
   message: string
+  industry: string
   inquiryType: string
   /* 간편 의뢰일 때만 채워 보낸다 — 비어 있으면 줄을 띄우지 않는다 */
   budget: string
@@ -374,8 +389,9 @@ function mailHtml({
     ['의뢰 유형', inquiryType],
     ...((budget ? [['예산 범위', budget]] : []) as [string, string][]),
     ['성함 / 회사명', name],
-    ['이메일', email],
+    ['이메일', email || '미입력'],
     ['연락처', phone],
+    ['업종', industry || '미입력'],
     ['받는 디자이너', designerName ? `${designerName}${viaRef ? ' · 초대 링크로 온 의뢰' : ''}` : '지정 안 함'],
   ]
 

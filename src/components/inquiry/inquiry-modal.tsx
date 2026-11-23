@@ -1,5 +1,6 @@
 'use client'
 
+import { useIndustries } from './use-industries'
 import { useEffect, useState } from 'react'
 import { PriceLabel } from '../price-label'
 import { Consent, Dialog, Done, Field, FileField, ReadonlyRow, inputCls } from './form-bits'
@@ -203,6 +204,7 @@ export function InquiryModal({
     }
   }, [given])
 
+  const industries = useIndustries()
   const [done, setDone] = useState(false)
   const [sending, setSending] = useState(false)
   const [error, setError] = useState('')
@@ -591,25 +593,25 @@ export function InquiryModal({
               />
             </Field>
 
-            {/* 주소가 길어 반 칸에서는 끝이 가려진다 — 한 줄을 다 쓴다 */}
-            <div className="md:col-span-2">
-              <Field label="이메일주소" req>
-                <input
-                  required
-                  type="email"
-                  name="email"
-                  maxLength={200}
-                  autoComplete="email"
-                  className={inputCls}
-                  placeholder=""
-                />
-              </Field>
-            </div>
+            {/* 업종(선택) — 목록은 어드민 설정 > 업종 목록(마케팅 문의 폼과 같은 목록) */}
+            <Field label="업종">
+              <select name="industry" defaultValue="" className={`${inputCls} invalid:text-neutral-400`}>
+                <option value="">선택 안 함</option>
+                {industries.map((i) => (
+                  <option key={i} value={i} className="text-neutral-900">
+                    {i}
+                  </option>
+                ))}
+              </select>
+            </Field>
+
+            <Field label="이메일주소">
+              <input type="email" name="email" maxLength={200} autoComplete="email" className={inputCls} placeholder="" />
+            </Field>
 
             <div className="md:col-span-2">
-              <Field label="문의내용" req>
+              <Field label="문의내용">
                 <textarea
-                  required
                   name="message"
                   rows={6}
                   /* 견적표 구성이 앞에 붙어도 서버 한도(5000자)를 넘지 않게 */

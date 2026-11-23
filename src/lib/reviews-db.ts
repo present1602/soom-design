@@ -106,7 +106,8 @@ async function whoFor(t: TokenRow): Promise<{
       designerId: i.designer_id ?? null,
       designerName: i.designer_name ?? null,
       authorName: i.name ?? '',
-      authorEmail: i.email ?? '',
+      // 이메일은 선택(0038) — 0038 전 DB 에 '미입력'으로 들어온 문의는 빈 칸으로
+      authorEmail: i.email?.includes('@') ? i.email : '',
     }
   }
 

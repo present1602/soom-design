@@ -1,5 +1,6 @@
 import 'server-only'
 import { supabaseAdmin } from './supabase-admin'
+import { DEFAULT_INDUSTRIES } from './industries'
 import {
   FALLBACK_PLAN_COPIES,
   isBucket,
@@ -167,6 +168,18 @@ export async function getChatPublic(): Promise<boolean> {
   }
 
   return (data?.chat_public as boolean | undefined) ?? false
+}
+
+/* 의뢰·마케팅 문의 폼의 업종 목록(0038). 칸이 없거나(0038 전) 비어 있으면 기본 목록 */
+export async function getIndustries(): Promise<string[]> {
+  if (!supabaseAdmin) return [...DEFAULT_INDUSTRIES]
+  const { data, error } = await supabaseAdmin.from('site_settings').select('industries').eq('id', true).maybeSingle()
+  if (error) {
+    if (!error.message.includes('industries')) console.error('[settings] 업종 목록 조회 실패:', error.message)
+    return [...DEFAULT_INDUSTRIES]
+  }
+  const list = (data?.industries as string[] | null | undefined) ?? []
+  return list.length ? list : [...DEFAULT_INDUSTRIES]
 }
 
 /* 탐색 '전체'일 때 제목 아래 문구(0002_specialty_description.sql). 읽지 못하면 빈 글자 —

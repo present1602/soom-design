@@ -253,9 +253,13 @@ function Detail({
     <div className="border-t border-neutral-200 bg-white px-4 py-4">
       <dl className="grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
         <Row k="이메일">
-          <a href={`mailto:${q.email}`} className="text-violet-600 hover:underline">
-            {q.email}
-          </a>
+          {q.email?.includes('@') ? (
+            <a href={`mailto:${q.email}`} className="text-violet-600 hover:underline">
+              {q.email}
+            </a>
+          ) : (
+            <span className="text-neutral-400">미입력</span>
+          )}
         </Row>
         <Row k="연락처">
           {q.phone ? (
@@ -265,6 +269,9 @@ function Detail({
           ) : (
             <span className="text-neutral-400">없음</span>
           )}
+        </Row>
+        <Row k="업종">
+          {q.industry ?? <span className="text-neutral-400">미입력</span>}
         </Row>
         {q.designer_name && (
           <Row k="디자이너">
@@ -302,7 +309,7 @@ function Detail({
 
       <div className="mt-4">
         <p className="text-xs font-medium text-neutral-600">문의 내용</p>
-        <p className="mt-1.5 whitespace-pre-wrap text-sm leading-relaxed">{q.message}</p>
+        <p className="mt-1.5 whitespace-pre-wrap text-sm leading-relaxed">{q.message || <span className="text-neutral-400">미입력</span>}</p>
       </div>
 
       {q.files.length > 0 && (
@@ -327,12 +334,16 @@ function Detail({
         </div>
       )}
 
-      <a
-        href={`mailto:${q.email}?subject=${encodeURIComponent(`[soom] ${q.name}님 문의 회신`)}`}
-        className="mt-4 inline-block rounded-lg bg-neutral-900 px-4 py-2 text-xs font-semibold text-white transition hover:bg-violet-600"
-      >
-        메일로 답장
-      </a>
+      {q.email?.includes('@') ? (
+        <a
+          href={`mailto:${q.email}?subject=${encodeURIComponent(`[soom] ${q.name}님 문의 회신`)}`}
+          className="mt-4 inline-block rounded-lg bg-neutral-900 px-4 py-2 text-xs font-semibold text-white transition hover:bg-violet-600"
+        >
+          메일로 답장
+        </a>
+      ) : (
+        <p className="mt-4 text-xs text-neutral-500">이메일을 적지 않은 문의예요. 연락처로 연락해 주세요.</p>
+      )}
 
       <ReviewRequest inquiry={q} designers={designers} onNotice={onNotice} />
     </div>

@@ -41,10 +41,11 @@ export type InquiryRow = {
   created_at: string
 
   name: string
-  email: string
+  /* 선택(0038). 0038 전 DB 에 빈 값으로 들어온 문의는 '미입력' */
+  email: string | null
   /* 013 이전에 들어온 문의는 비어 있다 */
   phone: string | null
-  message: string
+  message: string | null
   /* 014 이전에 들어온 문의는 비어 있다. 0003 부터는 고른 범위
      (메인화면 시안 먼저 의뢰 / 디자인 / 프로젝트 의뢰) */
   inquiry_type: string | null
@@ -56,6 +57,8 @@ export type InquiryRow = {
   /* 간편 의뢰에서 고른 예산 범위(0021_inquiry_budget.sql) — 선택사항이라 비어 있을 수 있다.
      0021 전에는 select('*') 에 없어 undefined 로 온다. */
   budget?: string | null
+  /* 업종(선택, 0038_inquiry_industry_optional_message.sql). 0038 전에는 undefined */
+  industry?: string | null
 
   /* 특정 디자이너에게 보낸 문의면 채워진다. 외래키가 없으므로
      그 디자이너가 지워졌어도 이름은 남아 있다. */
