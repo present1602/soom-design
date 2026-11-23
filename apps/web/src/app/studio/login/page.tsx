@@ -46,17 +46,17 @@ export default async function DesignerLoginPage() {
         {/* 아직 디자이너가 아닌 사람이 여기까지 올 수 있다 —
             무엇을 하는 곳인지, 어떻게 합류하는지로 이어준다 */}
         <div className="mt-8 border-t border-neutral-200 pt-6 text-center">
-          <p className="text-xs text-neutral-500">SOOM 디자이너로 활동하고 싶다면</p>
+          {/* <p className="text-xs text-neutral-500">SOOM 디자이너로 활동하고 싶다면</p>
           <Link
             href="/designers/proposal/v1"
             className="mt-1.5 inline-block text-sm font-medium text-violet-600 transition hover:text-violet-700"
           >
             디자이너 제안서 보기 →
-          </Link>
-          {/* 제안서를 이미 봤거나 바로 합류하려는 사람을 위한 지름길 */}
+          </Link> */}
+          {/* 합류하려는 사람을 위한 지름길 */}
           <Link
             href="/designers/apply"
-            className="mt-1 block text-sm font-medium text-violet-600 transition hover:text-violet-700"
+            className="block text-sm font-medium text-violet-600 transition hover:text-violet-700"
           >
             디자이너 신청하기 →
           </Link>

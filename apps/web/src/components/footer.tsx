@@ -19,43 +19,52 @@ export function Footer() {
               <span className="font-serif text-2xl leading-none font-semibold tracking-[0.08em]">SOOM</span>
               <span className="serif-i text-base">by designers,</span>
             </p>
-            {/* 로고는 영문 SOOM 뿐이라, 사람들이 검색창에 적는 이름 꼴
-                (숨디자인·soom.it·숨it)을 화면 글자로 한 번 둔다 —
-                구글은 페이지에 보이는 글자로만 검색어와 맞춰 본다 */}
-            <p className="mt-2 text-[11px] text-ink-faint">
-              숨디자인 · soom.it · 숨it — 숨 웹디자인 · 웹개발 · 홈페이지 개발
-            </p>
 
-            <dl className="mt-5 space-y-1 text-[11px] leading-relaxed text-ink-faint">
-              <Row k="상호">밸런스</Row>
-              <Row k="사업자등록번호">464-12-02831</Row>
-              <Row k="사업장 소재지">서울 마포구 서교동 와우산로 162-10 2층</Row>
-              <Row k="전화번호">02-6954-2567</Row>
-              <Row k="이메일">
-                <a href="mailto:manager@soom.it" className="transition hover:text-plum">
-                  manager@soom.it
-                </a>
-              </Row>
-            </dl>
+            {/* 사업자 정보 오른쪽에 글자 메뉴 — 줄 간격을 dl 과 똑같이 둬서
+                FAQ 는 '상호' 줄, 이용약관은 '사업자등록번호' 줄과 높이가 맞는다 */}
+            <div className="mt-5 flex gap-8 text-[11px] leading-relaxed sm:gap-16">
+              <dl className="min-w-0 space-y-1 text-ink-faint">
+                <Row k="상호">밸런스</Row>
+                <Row k="사업자등록번호">464-12-02831</Row>
+                <Row k="사업장 소재지">서울 마포구 서교동 와우산로 162-10 2층</Row>
+                <Row k="전화번호">02-6954-2567</Row>
+                <Row k="이메일">
+                  <a href="mailto:manager@soom.it" className="transition hover:text-plum">
+                    manager@soom.it
+                  </a>
+                </Row>
+              </dl>
+              <nav aria-label="하단 메뉴" className="flex shrink-0 flex-col items-start space-y-1">
+                <Link href="/faq" className="text-ink-soft transition hover:text-plum">
+                  FAQ
+                </Link>
+                {/* <Link href="/designers/proposal/v1" className="text-ink-soft transition hover:text-plum">
+                  디자이너 제안서
+                </Link> */}
+                <Link href="/terms" className="text-ink-soft transition hover:text-plum">
+                  이용약관
+                </Link>
+              </nav>
+            </div>
           </div>
 
-          {/* 디자이너를 위한 길 — 고객용 화면 어디에도 없어 여기서만 들어간다 */}
-          <nav aria-label="하단 메뉴" className="flex shrink-0 flex-col gap-2.5 text-xs sm:mt-1 sm:items-end">
-            <Link href="/studio/login" className="text-ink-soft transition hover:text-plum">
-              디자이너 로그인
-            </Link>
-            <Link href="/designers/proposal/v1" className="text-ink-faint transition hover:text-plum">
-              디자이너 제안서
-            </Link>
-            <Link href="/terms" className="text-ink-faint transition hover:text-plum">
-              이용약관
-            </Link>
-          </nav>
+          {/* 디자이너를 위한 길 — 고객용 화면 어디에도 없어 여기서만 들어간다.
+              넓은 화면에서는 사업자 정보의 아래쪽 끝에 맞춘다 */}
+          <Link
+            href="/studio/login"
+            className="shrink-0 self-start border border-ink-faint px-3 py-1.5 text-[11px] text-ink-soft transition hover:border-ink-soft hover:bg-ink-soft hover:text-paper sm:self-end"
+          >
+            디자이너 로그인
+          </Link>
         </div>
 
-        <p className="mt-10 border-t border-line pt-6 text-[11px] text-ink-faint">
-          © 2026 Balance. All rights reserved.
-        </p>
+        <div className="mt-10 flex flex-col gap-2 border-t border-line pt-6 text-[11px] text-ink-faint sm:flex-row sm:items-baseline sm:justify-between">
+          <p>© 2026 Balance. All rights reserved.</p>
+          {/* 로고는 영문 SOOM 뿐이라, 사람들이 검색창에 적는 이름 꼴
+              (숨디자인·soom.it·숨it)을 화면 글자로 한 번 둔다 —
+              구글은 페이지에 보이는 글자로만 검색어와 맞춰 본다 */}
+          <p className="sm:text-right">숨디자인 · soom.it · 숨it — 숨 웹디자인 · 웹개발 · 홈페이지 개발</p>
+        </div>
       </div>
     </footer>
   )
