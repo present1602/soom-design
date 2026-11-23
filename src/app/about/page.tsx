@@ -343,7 +343,7 @@ function AppDesign() {
             src={appShot}
             alt="여행 앱 NO:PLE 의 홈 화면과 로그인 화면 디자인"
             sizes="(min-width: 1024px) 460px, 80vw"
-            className="relative h-auto w-full mix-blend-multiply"
+            className="relative h-auto w-full"
           />
           <figcaption className="relative mt-3 text-center text-[11.5px] text-neutral-500">
             예) NO:PLE — 여행 일정 앱
