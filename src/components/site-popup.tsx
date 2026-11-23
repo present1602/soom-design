@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 import {
   POPUP_COLORS,
   POPUP_SIZES,
@@ -130,20 +130,32 @@ export function SitePopups({ popups }: { popups: PublicPopup[] }) {
   )
 }
 
+/* 이미지 한 장뿐인 팝업이면 푸터를 이미지 위에 투명하게 얹는다 — PopupCard 가 정한다 */
+const FooterOverlay = createContext(false)
+
 /* 하단 — 보지 않기 두 개를 오른쪽에 모은다. 닫기는 우상단 X 가 맡는다. */
 export function PopupFooter({ more = 0, onHide }: { more?: number; onHide?: (days: number) => void }) {
+  const overlay = useContext(FooterOverlay)
+  const btn = overlay ? 'transition hover:text-white/75' : 'transition hover:text-neutral-950'
   return (
-    <div className="flex items-center gap-3 border-t border-neutral-200 px-5 py-2.5 text-xs">
+    <div
+      className={
+        overlay
+          ? /* 이미지 밑단이 밝아도 글자가 읽히게 아래쪽만 살짝 어둡게 깐다 */
+            'flex items-center gap-3 bg-gradient-to-t from-black/55 via-black/25 to-transparent px-5 pb-3 pt-8 text-xs text-white [text-shadow:0_1px_2px_rgb(0_0_0/0.5)]'
+          : 'flex items-center gap-3 border-t border-neutral-200 px-5 py-2.5 text-xs'
+      }
+    >
       {/* 뒤에 더 있으면 알린다 — 닫았는데 또 떠서 놀라지 않게 */}
-      {more > 0 && <span className="text-neutral-400">{more}개 더 있음</span>}
-      <div className="ml-auto flex items-center gap-2 text-neutral-700">
-        <button type="button" onClick={() => onHide?.(1)} className="transition hover:text-neutral-950">
+      {more > 0 && <span className={overlay ? 'text-white/75' : 'text-neutral-400'}>{more}개 더 있음</span>}
+      <div className={`ml-auto flex items-center gap-2 ${overlay ? '' : 'text-neutral-700'}`}>
+        <button type="button" onClick={() => onHide?.(1)} className={btn}>
           오늘 하루 보지 않기
         </button>
-        <span aria-hidden className="text-neutral-300">
+        <span aria-hidden className={overlay ? 'text-white/50' : 'text-neutral-300'}>
           |
         </span>
-        <button type="button" onClick={() => onHide?.(7)} className="transition hover:text-neutral-950">
+        <button type="button" onClick={() => onHide?.(7)} className={btn}>
           일주일간 보지 않기
         </button>
       </div>
@@ -185,6 +197,10 @@ export function PopupCard({
   footer?: React.ReactNode
   onClose?: () => void
 }) {
+  /* 제목·글·첨부 없이 이미지 한 장뿐이면 이미지가 곧 팝업이다 — 푸터를 그 위에 얹는다 */
+  const imageOnly =
+    !popup.title && popup.files.length === 0 && popup.body.length === 1 && popup.body[0].type === 'image'
+
   return (
     <div className="relative flex max-h-[90vh] w-[min(32rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
       {/* 본문이 이미지로 시작하면 그 위에 얹힌다 — 흰 원판을 깔아 어느 배경에서도 보이게 */}
@@ -246,7 +262,14 @@ export function PopupCard({
         )}
       </div>
 
-      {footer}
+      {footer &&
+        (imageOnly ? (
+          <FooterOverlay.Provider value>
+            <div className="absolute inset-x-0 bottom-0 z-10">{footer}</div>
+          </FooterOverlay.Provider>
+        ) : (
+          footer
+        ))}
     </div>
   )
 }

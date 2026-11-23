@@ -4,7 +4,7 @@ import modelJang from '@/assets/marketing/model-jang-wonyi.jpg'
 import modelKang from '@/assets/marketing/model-kang-youngsun.jpg'
 import modelMuyeol from '@/assets/marketing/model-muscle-muyeol.jpg'
 import { MarketingLeadButton } from '@/components/marketing-lead'
-import { marketingTaglines } from '@/lib/marketing-models'
+import { marketingModels, type ConsoleModel } from '@/lib/marketing-models'
 
 export const metadata: Metadata = {
   title: 'SNS 콘텐츠 마케팅 대행',
@@ -20,9 +20,10 @@ export const metadata: Metadata = {
    인상을 입힌다 — 굵은 고딕 제목, 주황 포인트(ACCENT), 둥근 카드, 휴대폰 모형, 어두운 모델 구역.
    사이트의 장밋빛(plum)·세리프 이탤릭은 쓰지 않는다. 색은 이 파일의 상수로만 쓴다(globals.css 를 건드리지 않음).
 
-   AI 모델은 마케팅 콘솔(apps/marketing)에서 "공개" 상태인 모델을 손으로 옮겨 적는다 — 서비스끼리 DB 를 공유하지 않는다.
-   단 한줄 소개는 consoleId 로 콘솔 공개 API 에서 읽어 소개 문단 자리에 보인다(lib/marketing-models.ts, MARKETING_CONSOLE_URL).
-   사진은 콘솔 대표 사진을 720px JPG 로 줄여 src/assets/marketing/ 에 두고 import 한다(2026-11-23: 장원이·강영선·머슬무열).
+   AI 모델 카드의 순서·업종·역할·흐린 칸은 여기에 적는다 — 서비스끼리 DB 를 공유하지 않는다.
+   이름·한줄 소개·대표 사진은 consoleId 로 콘솔 공개 API 에서 읽어 덮어쓴다(lib/marketing-models.ts, MARKETING_CONSOLE_URL).
+   콘솔을 못 읽거나 값이 비면 여기 적은 name·lead 와 src/assets/marketing/ 의 사진(2026-11-23 콘솔 대표 사진을 720px JPG 로 줄인 것)으로 보인다.
+   콘솔에서 새로 공개한 모델은 저절로 카드가 생기지 않는다 — MODELS 에 consoleId 를 넣어 한 줄 더한다.
    open: false 면 사진·이름 없이 "공개 예정" 카드로 보인다.
    흐린 글은 화면 읽기 프로그램에 읽히지 않게 aria-hidden 으로 감추고, 대신 "곧 전체 공개" 를 읽어 준다. */
 
@@ -39,7 +40,7 @@ const inquiryButton = `rounded-xl border-[#C93A0C] ${ACCENT_BG} text-white hover
 type Model = {
   field: string
   open: boolean
-  /** 마케팅 콘솔의 virtual_models.id — 콘솔에서 적은 한줄 소개를 lead 대신 보여 준다(없으면 lead) */
+  /** 마케팅 콘솔의 virtual_models.id — 콘솔의 이름·한줄 소개·대표 사진을 name·lead·photo 대신 보여 준다(비면 이 값) */
   consoleId?: string
   name?: string
   role?: string
@@ -137,7 +138,7 @@ const CHANNELS = [
 ]
 
 export default async function MarketingPage() {
-  const taglines = await marketingTaglines()
+  const fromConsole = await marketingModels()
   return (
     <main className="flex-1 bg-paper text-[#15171C]">
       {/* 머리말 — 왼쪽 글, 오른쪽 숏폼 휴대폰 모형 */}
@@ -207,7 +208,7 @@ export default async function MarketingPage() {
           <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {MODELS.map((m) => (
               <li key={m.field} className="min-w-0">
-                {m.open ? <OpenModel m={m} tagline={m.consoleId ? taglines[m.consoleId] : undefined} /> : <LockedModel m={m} />}
+                {m.open ? <OpenModel m={m} live={m.consoleId ? fromConsole[m.consoleId] : undefined} /> : <LockedModel m={m} />}
               </li>
             ))}
           </ul>
@@ -293,14 +294,17 @@ function PhoneMockup() {
 }
 
 /* 공개 모델 — 이름·직업·소개 앞부분까지 보이고, 성격·말투·목소리는 흐리게 */
-function OpenModel({ m, tagline }: { m: Model; tagline?: string }) {
-  // 콘솔의 한줄 소개(최대 100자)가 있으면 그것을, 없으면 이 파일의 소개. 칸을 넘으면 세 줄에서 … 로 자른다
-  const lead = tagline || m.lead
+function OpenModel({ m, live }: { m: Model; live?: ConsoleModel }) {
+  // 콘솔 값이 있으면 그것을, 없으면 이 파일의 값. 한줄 소개(최대 100자)가 칸을 넘으면 세 줄에서 … 로 자른다
+  const name = live?.name || m.name
+  const lead = live?.tagline || m.lead
+  const photo = live?.photo || m.photo
   return (
     <article className={`flex h-full flex-col overflow-hidden rounded-[20px] border ${CARD_DARK}`}>
       <div className={`relative aspect-[4/3] ${m.tint}`}>
-        {m.photo ? (
-          <Image src={m.photo} alt={`AI 가상 모델 ${m.name}`} fill sizes="(min-width: 1024px) 380px, (min-width: 640px) 50vw, 100vw" placeholder="blur" className="object-cover object-[center_18%]" />
+        {photo ? (
+          /* 콘솔 사진은 원본(PNG 2MB 남짓)이라 next/image 가 줄여서 내보낸다. 흐린 미리보기는 손으로 넣은 사진에만 있다 */
+          <Image src={photo} alt={`AI 가상 모델 ${name}`} fill sizes="(min-width: 1024px) 380px, (min-width: 640px) 50vw, 100vw" placeholder={typeof photo === 'string' ? 'empty' : 'blur'} className="object-cover object-[center_18%]" />
         ) : (
           <div aria-hidden="true" className="grid size-full place-items-center">
             <span className="grid size-24 place-items-center rounded-full bg-white/70 text-[38px] font-extrabold text-[#15171C]">{m.initial}</span>
@@ -311,7 +315,7 @@ function OpenModel({ m, tagline }: { m: Model; tagline?: string }) {
       </div>
       <div className="flex flex-1 flex-col gap-3 p-6">
         <div className="flex flex-wrap items-baseline gap-x-2.5">
-          <h3 className="text-[22px] font-bold text-white">{m.name}</h3>
+          <h3 className="text-[22px] font-bold text-white">{name}</h3>
           <span className="text-[14px] text-[#AEB2BC]">{m.role}</span>
         </div>
         <p className="line-clamp-3 text-[15px] leading-[1.7] break-keep text-[#DADCE1]" title={lead}>{lead}</p>

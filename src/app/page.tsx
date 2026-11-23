@@ -81,9 +81,12 @@ export default function Home() {
             lede="업종과 분위기가 비슷한 작업을 먼저 살펴보고, 마음에 드는 디자이너에게 의뢰하세요."
             sideEnd
             side={
-              <ExploreLink className="group inline-flex min-h-11 008items-center gap-3 border border-ink px-4 text-[13px] font-semibold text-ink transition hover:bg-ink hover:text-paper">
+              <ExploreLink className="group inline-flex min-h-11 items-center gap-3 border border-ink/45 px-4 text-[13px] font-semibold text-ink/70 transition hover:border-ink hover:bg-ink hover:text-paper">
                 디자이너 보기
-                <span aria-hidden="true" className="">→</span>
+                {/* 한글은 글자 모양이 줄 상자 가운데보다 살짝 아래에 놓인다 — 아이콘을 1px 내려 글자와 맞춘다 */}
+                <svg aria-hidden="true" viewBox="0 0 24 24" className="size-3.5 translate-y-px" fill="none" stroke="currentColor" strokeWidth={2.25} strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 5l7 7-7 7" />
+                </svg>
               </ExploreLink>
             }
           />

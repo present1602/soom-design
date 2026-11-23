@@ -28,8 +28,8 @@ export const LANDING_INCLUDES = [
 /* 일반 웹사이트·프리미엄 — 기능을 골라 더하는 대신 상담으로 견적을 정한다.
    홈 가격 카드(app/page.tsx)와 소개 견적표가 같은 숫자를 쓴다. */
 export const WEBSITE_PRICE = {
-  was: 1_490_000,
-  price: 990_000,
+  was: 990_000,
+  price: 890_000,
   caseDiscount: 100_000,
 } as const
 
