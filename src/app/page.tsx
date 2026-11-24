@@ -376,11 +376,8 @@ function HomePlans() {
         </div>
 
         {/* 카드마다 두지 않고 여기 한 번만 */}
-        <div className="mt-6 space-y-0.5 text-xs leading-relaxed text-ink-faint">
-          {/* 연베이지 바탕에 노란 글자는 안 읽혀서 형광펜처럼 노란 바탕을 깐다 */}
-          <p>
-            <span className="rounded-sm bg-yellow-200 px-1 py-0.5 text-ink">**개발 범위에 따라 견적이 달라집니다.</span>
-          </p>
+        <div className="mt-6 space-y-0.5 text-xs leading-relaxed text-ink-soft">
+          <p>**개발 범위에 따라 견적이 달라집니다.</p>
           <p>추가 할인은 완성된 홈페이지를 SOOM 사례로 게재하는 데 동의하시면 적용되는 한시적 이벤트 할인입니다.</p>
         </div>
       </div>

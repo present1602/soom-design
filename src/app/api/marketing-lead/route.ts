@@ -4,6 +4,7 @@ import { allowedEmails } from '@/lib/admin-auth'
 import { supabaseAdmin, supabaseConfigured } from '@/lib/supabase-admin'
 import { LEAD_URL_FIELDS, MARKETING_MESSAGE_MAX, normalizeUrl } from '@/lib/marketing-lead'
 import { INDUSTRY_NAME_MAX } from '@/lib/industries'
+import { recordAlimtalk, sendAlimtalk } from '@/lib/alimtalk'
 
 /* 마케팅 문의는 DB에 저장한 뒤 알림 메일을 보낸다. */
 
@@ -124,6 +125,11 @@ export async function POST(req: Request) {
     } else {
       console.warn('[marketing-lead] 메일 미설정 — 접수만 저장됨:', row.id)
     }
+
+    /* 고객에게 접수 확인 알림톡 — 실패해도 접수는 성공이다(결과는 alimtalk 칸, 0039) */
+    const talk = await sendAlimtalk('marketingLead', phone, { 이름: contactName || company, 업종: industry, 지역: region })
+    if (talk.status === 'failed') console.error('[marketing-lead] 알림톡 실패 (접수는 저장됨):', row.id, talk.error)
+    await recordAlimtalk('marketing_leads', row.id, talk)
 
     return NextResponse.json({ ok: true })
   } catch (e) {

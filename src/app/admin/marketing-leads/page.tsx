@@ -23,6 +23,9 @@ type MarketingLead = {
   industry: string
   message?: string | null
   mailed: boolean
+  /* 접수 확인 알림톡 결과(0039) — 그 전 DB 에서는 undefined */
+  alimtalk?: 'sent' | 'failed' | 'skipped' | null
+  alimtalk_error?: string | null
 } & Record<(typeof LEAD_URL_FIELDS)[number]['column'], string | null>
 
 const PAGE_SIZE = 50
@@ -34,17 +37,20 @@ async function listLeads(page: number) {
   if (!db) return { rows: [], problem: 'Supabase가 설정되지 않아 문의를 조회할 수 없습니다.' }
 
   const start = (page - 1) * PAGE_SIZE
-  const query = (includeMessage: boolean) => db
+  const query = (includeMessage: boolean, includeAlimtalk: boolean) => db
     .from('marketing_leads')
-    .select(includeMessage ? fields + ', message' : fields)
+    .select(fields + (includeMessage ? ', message' : '') + (includeAlimtalk ? ', alimtalk, alimtalk_error' : ''))
     .order('created_at', { ascending: false })
     .order('id', { ascending: false })
     .range(start, start + PAGE_SIZE)
     .overrideTypes<MarketingLead[], { merge: false }>()
 
-  let result = await query(true)
-  const missingMessage = result.error?.code === '42703' || result.error?.code === 'PGRST204'
-  if (missingMessage) result = await query(false)
+  const missingColumn = (code?: string) => code === '42703' || code === 'PGRST204'
+  /* 알림톡 결과 칸(0039)부터 붙여 보고, 없으면 빼고 다시 묻는다 */
+  let result = await query(true, true)
+  if (missingColumn(result.error?.code)) result = await query(true, false)
+  const missingMessage = missingColumn(result.error?.code)
+  if (missingMessage) result = await query(false, false)
 
   if (result.error) {
     const missingTable = result.error.code === '42P01' || result.error.code === 'PGRST205'
@@ -90,6 +96,10 @@ export default async function AdminMarketingLeadsPage({ searchParams }: PageProp
                   <span className={lead.mailed ? 'text-emerald-700' : 'text-amber-700'}>
                     {lead.mailed ? '이메일 발송 완료' : '이메일 미발송'}
                   </span>
+                  {lead.alimtalk === 'sent' && <span className="text-emerald-700">알림톡 발송</span>}
+                  {lead.alimtalk === 'failed' && (
+                    <span title={lead.alimtalk_error ?? undefined} className="text-red-700">알림톡 실패</span>
+                  )}
                 </div>
               </div>
               <dl className="mt-3 grid gap-x-6 gap-y-3 text-sm sm:grid-cols-3">

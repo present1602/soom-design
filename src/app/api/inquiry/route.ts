@@ -10,6 +10,7 @@ import { listCategoryMetas } from '@/lib/specialties'
 import { priceOf } from '@/lib/specialty-shape'
 import { withDownloadName } from '@/lib/download-name'
 import { claimInquiryFile, fileProblem, safeName } from '@/lib/inquiry-files'
+import { recordAlimtalk, sendAlimtalk } from '@/lib/alimtalk'
 
 /* 의뢰 문의 접수.
 
@@ -350,6 +351,12 @@ export async function POST(req: Request) {
     } else {
       console.warn('[inquiry] 메일 미설정 — 접수만 저장됨:', row.id)
     }
+
+    /* ── 고객에게 접수 확인 알림톡 ── 실패해도 접수는 성공이다.
+       결과는 alimtalk 칸(0039)에 남아 어드민 목록에서 실패한 건이 보인다 */
+    const talk = await sendAlimtalk('inquiry', phone, { 이름: name, 분야: category || '미선택' })
+    if (talk.status === 'failed') console.error('[inquiry] 알림톡 실패 (접수는 저장됨):', row.id, talk.error)
+    await recordAlimtalk('inquiries', row.id as string, talk)
 
     return NextResponse.json({ ok: true, id: row.id, files: uploaded.length, mailed })
   } catch (err) {

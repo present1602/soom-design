@@ -199,6 +199,15 @@ function InquiryItem({
                 메일 미발송
               </span>
             )}
+            {/* 고객이 접수 확인 알림톡을 못 받았다 — 직접 연락해야 할 수 있다 */}
+            {q.alimtalk === 'failed' && (
+              <span
+                title={q.alimtalk_error ?? undefined}
+                className="rounded bg-red-100 px-1.5 py-0.5 text-[11px] text-red-800"
+              >
+                알림톡 실패
+              </span>
+            )}
           </div>
 
           <p className="mt-1 line-clamp-1 text-xs text-neutral-600">{q.message}</p>

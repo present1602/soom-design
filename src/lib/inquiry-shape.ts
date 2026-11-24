@@ -82,6 +82,11 @@ export type InquiryRow = {
   /* 알림 메일이 나갔는지. 거짓이면 메일로는 못 받았다는 뜻이라
      목록에서 눈에 띄게 표시한다. */
   mailed: boolean
+
+  /* 고객에게 보낸 접수 확인 알림톡 결과(0039_alimtalk_status.sql, lib/alimtalk.ts).
+     0039 전 DB 에서는 undefined, 그 전에 들어온 건은 null */
+  alimtalk?: 'sent' | 'failed' | 'skipped' | null
+  alimtalk_error?: string | null
 }
 
 /* 목록 필터 — 전체와 두 상태 */

@@ -55,6 +55,9 @@ function fabRight(viewportWidth: number): number {
   return FAB_GAP
 }
 
+/* 카카오톡 채널 1:1 채팅 — 패널 맨 아래 '카카오톡으로 문의하기' 단추가 연다 */
+const KAKAO_CHAT_URL = 'https://pf.kakao.com/_SxfQFX/chat'
+
 type Line =
   | { kind: 'user' | 'bot'; text: string }
   /* 실패 — 대화 줄 안에 남긴다. 다시 묻게 하려고 지우지 않는다 */
@@ -498,6 +501,20 @@ export function ChatWidget({ adminOnly, intents }: { adminOnly: boolean; intents
                 </button>
               </>
             )}
+
+            {/* 카카오톡 채널 1:1 채팅 — 새 창(앱이 깔려 있으면 카카오톡이 열린다).
+                의뢰 단추보다 눈에 덜 띄게 작게, 오른쪽 끝에 둔다 */}
+            <div className="mt-1 flex justify-end">
+              <a
+                href={KAKAO_CHAT_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="카카오톡으로 문의하기 (새 창)"
+                className="rounded-md bg-[#FEE500] px-2.5 py-1 text-[11px] font-semibold text-[#191919] transition hover:brightness-95"
+              >
+                카카오톡으로 문의하기
+              </a>
+            </div>
           </div>
         </div>
       )}
