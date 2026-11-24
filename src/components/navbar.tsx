@@ -17,13 +17,33 @@ import { DEFAULT_SITE_MENUS, SITE_MENU_ITEMS, type SiteMenus } from '@/lib/site-
    오른쪽 끝에 둔다. */
 export function Navbar({ menus }: { menus?: Partial<SiteMenus> | null }) {
   const [inquiry, setInquiry] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
   const pathname = usePathname()
-  const hidden = useHideOnScroll()
+  // 메뉴를 펼친 동안에는 스크롤해도 바를 숨기지 않는다 — 펼친 메뉴가 바와 함께 사라진다
+  const hidden = useHideOnScroll() && !menuOpen
   // 설정이 전달되지 않거나 일부 항목이 빠져도 기본 메뉴로 표시한다.
   const items = SITE_MENU_ITEMS.map((item) => ({
     ...item,
     ...(menus?.[item.key] ?? DEFAULT_SITE_MENUS[item.key]),
-  }))
+  })).filter(({ visible }) => visible)
+
+  useEffect(() => {
+    if (!menuOpen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMenuOpen(false)
+    }
+    // 넓은 화면으로 바뀌면 햄버거가 사라지므로 펼친 상태도 접는다
+    const wide = window.matchMedia('(min-width: 768px)')
+    const onWide = () => wide.matches && setMenuOpen(false)
+    window.addEventListener('keydown', onKey)
+    wide.addEventListener('change', onWide)
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      wide.removeEventListener('change', onWide)
+    }
+  }, [menuOpen])
+
+  const isActive = (href: string) => pathname === href || pathname?.startsWith(`${href}/`)
 
   return (
     <>
@@ -33,16 +53,30 @@ export function Navbar({ menus }: { menus?: Partial<SiteMenus> | null }) {
           hidden ? 'max-md:-translate-y-full' : ''
         }`}
       >
-        <div className="mx-auto flex min-h-14 max-w-[1240px] flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2 md:px-8">
+        <div className="mx-auto flex min-h-14 max-w-[1240px] items-center gap-x-4 px-4 py-2 md:px-8">
           {/* 세리프 영문 로고 + 작은 한글 이름 — 검색어로 쓰이는 '숨디자인'을 화면 글자로도 둔다 */}
           <Link href="/" aria-label="SOOM 홈" className="flex items-baseline gap-2.5 text-ink">
             <span className="font-serif text-[1.6rem] leading-none font-semibold tracking-[0.08em]">SOOM</span>
             <span className="hidden text-[10px] font-medium tracking-[0.14em] text-ink-faint sm:inline">숨디자인</span>
           </Link>
 
-          <nav aria-label="주요 메뉴" className="ml-auto flex min-w-0 flex-wrap items-center justify-end gap-x-4 gap-y-2 sm:gap-x-8">
-            {items.filter(({ visible }) => visible).map(({ key, href, name }) => {
-              const active = pathname === href || pathname?.startsWith(`${href}/`)
+          {/* 좁은 화면 — 메뉴를 로고 아래로 늘어놓지 않고 햄버거 하나로 접는다 */}
+          <button
+            type="button"
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-expanded={menuOpen}
+            aria-controls="site-mobile-menu"
+            aria-label={menuOpen ? '메뉴 닫기' : '메뉴 열기'}
+            className="-mr-2 ml-auto grid size-10 place-items-center text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-plum md:hidden"
+          >
+            <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+              {menuOpen ? <path d="M6 6l12 12M18 6L6 18" /> : <path d="M4 7h16M4 12h16M4 17h16" />}
+            </svg>
+          </button>
+
+          <nav aria-label="주요 메뉴" className="ml-auto hidden min-w-0 items-center justify-end gap-x-8 md:flex">
+            {items.map(({ key, href, name }) => {
+              const active = isActive(href)
               const className = `inline-flex min-h-10 items-center whitespace-nowrap border-b text-sm transition focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-plum ${active ? 'border-plum font-medium text-ink' : 'border-transparent text-ink-soft hover:text-ink'}`
               return key === 'explore' ? (
                 <ExploreLink key={key} className={className}>{name}</ExploreLink>
@@ -67,13 +101,61 @@ export function Navbar({ menus }: { menus?: Partial<SiteMenus> | null }) {
             <button
               type="button"
               onClick={() => setInquiry(true)}
-              className="ml-1 inline-flex min-h-10 items-center bg-ink px-4 text-[13px] font-semibold text-paper transition hover:bg-plum sm:ml-2 sm:px-5"
+              className="ml-2 inline-flex min-h-10 items-center bg-ink px-5 text-[13px] font-semibold text-paper transition hover:bg-plum"
             >
               의뢰하기
             </button>
           </nav>
         </div>
+
+        {/* 좁은 화면의 펼친 메뉴 — 바 바로 아래로 내려온다.
+            접어도 지우지 않고 감추기만 한다: 출시 전 '탐색'은 안내 창(ExploreLink)을 띄우는데,
+            메뉴를 지우면 그 창도 함께 사라진다. 항목을 누르면 메뉴는 접는다. */}
+        <nav
+          id="site-mobile-menu"
+          aria-label="주요 메뉴"
+          hidden={!menuOpen}
+          onClick={(e) => {
+            if ((e.target as HTMLElement).closest('a,button')) setMenuOpen(false)
+          }}
+          className="absolute inset-x-0 top-full border-b border-line bg-paper px-4 pt-2 pb-5 shadow-[0_20px_40px_-30px_rgb(21_23_28/0.5)] md:hidden"
+        >
+          <ul className="flex flex-col">
+            {items.map(({ key, href, name }) => {
+              const active = isActive(href)
+              const className = `flex min-h-12 w-full items-center border-b border-line text-[15px] ${active ? 'font-semibold text-ink' : 'text-ink-soft'}`
+              return (
+                <li key={key}>
+                  {key === 'explore' ? (
+                    <ExploreLink className={className}>{name}</ExploreLink>
+                  ) : (
+                    <Link href={href} aria-current={active ? 'page' : undefined} className={className}>{name}</Link>
+                  )}
+                </li>
+              )
+            })}
+            <li>
+              <Link
+                href="/marketing"
+                aria-current={pathname === '/marketing' ? 'page' : undefined}
+                className={`flex min-h-12 w-full items-center border-b border-line text-[15px] ${pathname === '/marketing' ? 'font-semibold text-ink' : 'text-ink-soft'}`}
+              >
+                마케팅 대행
+              </Link>
+            </li>
+          </ul>
+          <button
+            type="button"
+            onClick={() => setInquiry(true)}
+            className="mt-4 inline-flex min-h-12 w-full items-center justify-center bg-ink text-[14px] font-semibold text-paper transition hover:bg-plum"
+          >
+            의뢰하기
+          </button>
+        </nav>
       </header>
+
+      {/* 메뉴 바깥을 누르면 접는다. 헤더(backdrop-blur) 안의 fixed 는 헤더에 갇히므로 밖에 둔다 */}
+      {menuOpen && <div aria-hidden="true" onClick={() => setMenuOpen(false)} className="fixed inset-0 z-10 bg-ink/20 md:hidden" />}
 
       {/* 모달은 헤더 밖에 둔다 — 헤더가 sticky 라 그 안의 fixed 는
           뷰포트가 아니라 헤더를 기준으로 자리잡는다(56px 안에 갇힌다).

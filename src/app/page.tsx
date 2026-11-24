@@ -42,7 +42,7 @@ const PRICES: HomePrice[] = [
     ...WEBSITE_PRICE,
     startingAt: true,
     description: '기업 홍보에 적합한 가장 일반적인 홈페이지입니다.',
-    items: ['메인 시안 2종~3종', '고객분석을 반영한 디자인', '콘텐츠 관리 또는 예약 관리 등', '회원관리', '관리자페이지', '반응형 (PC·모바일)', '최대 30페이지', '1년 무상 배포·서버 관리'],
+    items: ['메인 시안 2종~3종', '고객분석을 반영한 디자인', '콘텐츠 관리 또는 예약 관리 등', '회원관리', '관리자페이지', '반응형 (PC·모바일)', '최대 25페이지', '1년 무상 배포·서버 관리'],
   },
   {
     label: '프리미엄 맞춤형 홈페이지',
@@ -59,6 +59,9 @@ const EVENT_PRICES = PRICES.filter((p) => p.caseDiscount != null)
 const SHORT_LABEL: Record<string, string> = {
   '일반 웹사이트/기업형 홈페이지': '업체 웹사이트 · 기업형',
 }
+
+/* 플랜 카드 오른쪽 위 '오픈 특가' 띠를 붙일 상품 — 강조 테두리(첫 카드)와는 따로 정한다 */
+const OPEN_SALE = new Set(['랜딩페이지 기본 플랜', '일반 웹사이트/기업형 홈페이지'])
 
 const wrap = 'mx-auto max-w-[1240px] px-5 md:px-8'
 
@@ -333,6 +336,7 @@ function HomePlans() {
         <div className="grid max-w-[34rem] gap-5 lg:max-w-none lg:grid-cols-3 lg:gap-y-0">
           {PRICES.filter(({ items }) => items.length > 0).map(({ label, description, items, ...p }, i) => {
             const pick = i === 0
+            const sale = OPEN_SALE.has(label)
             return (
               <article
                 key={label}
@@ -340,7 +344,7 @@ function HomePlans() {
                   pick ? 'border-plum shadow-[0_30px_60px_-40px_rgb(91_42_61/0.55)]' : 'border-line'
                 }`}
               >
-                {pick && <span className="absolute -top-px right-6 bg-plum px-2.5 py-1 text-[11px] font-semibold tracking-[0.06em] text-white">오픈 특가</span>}
+                {sale && <span className="absolute -top-px right-6 bg-plum px-2.5 py-1 text-[11px] font-semibold tracking-[0.06em] text-white">오픈 특가</span>}
                 <div>
                   <h3 className="text-[17px] font-semibold tracking-[-0.02em]">{label}</h3>
                   <p className="mt-1.5 text-[13px] leading-[1.7] text-ink-soft">{description}</p>
@@ -373,7 +377,10 @@ function HomePlans() {
 
         {/* 카드마다 두지 않고 여기 한 번만 */}
         <div className="mt-6 space-y-0.5 text-xs leading-relaxed text-ink-faint">
-          <p>**개발 범위에 따라 가격이 달라집니다.</p>
+          {/* 연베이지 바탕에 노란 글자는 안 읽혀서 형광펜처럼 노란 바탕을 깐다 */}
+          <p>
+            <span className="rounded-sm bg-yellow-200 px-1 py-0.5 text-ink">**개발 범위에 따라 견적이 달라집니다.</span>
+          </p>
           <p>추가 할인은 완성된 홈페이지를 SOOM 사례로 게재하는 데 동의하시면 적용되는 한시적 이벤트 할인입니다.</p>
         </div>
       </div>
