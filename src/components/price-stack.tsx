@@ -3,7 +3,7 @@ import type { HomePrice } from './home-cta'
 /* 플랜 카드의 가격 블록 — 훅이 없어 서버·클라이언트 어디서 불러도 된다.
 
    가격은 세 줄로 읽힌다.
-     1) 정가 줄 — 할인 전 금액(was)에 줄을 긋고 옆에 지금 정상가(price)
+     1) 정가 줄 — 지금 정상가(price)를 앞에, 그 뒤에 줄 그은 할인 전 금액(was)
      2) 최종가 — 사례 게재에 동의하면 caseDiscount 만큼 더 깎은 금액을 가장 크게
      3) 추가 할인 안내 · VAT
    caseDiscount 가 없는 상품(프리미엄)은 줄 그은 금액만 두고 price 를 크게 둔다.
@@ -26,13 +26,13 @@ export function PriceStack({
   return (
     <div className="text-left">
       <p className="flex min-h-5 flex-wrap items-baseline gap-x-2 text-xs tabular-nums text-ink-faint">
+        {hasCase && <span>정상가 {won(price)}원{tilde}</span>}
         {was != null && (
           <s className="decoration-ink-faint">
             <span className="sr-only">할인 전 </span>
             {won(was)}원
           </s>
         )}
-        {hasCase && <span>정상가 {won(price)}원{tilde}</span>}
       </p>
       <p className="mt-1 flex flex-wrap items-baseline gap-1.5">
         <b className="text-[2rem] leading-[1.15] font-semibold tracking-[-0.04em] tabular-nums text-ink">{won(final)}</b>
