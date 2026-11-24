@@ -504,7 +504,7 @@ export function ChatWidget({ adminOnly, intents }: { adminOnly: boolean; intents
 
             {/* 카카오톡 채널 1:1 채팅 — 새 창(앱이 깔려 있으면 카카오톡이 열린다).
                 의뢰 단추보다 눈에 덜 띄게 작게, 오른쪽 끝에 둔다 */}
-            <div className="mt-1 flex justify-end">
+            <div className="mt-1 flex justify-center">
               <a
                 href={KAKAO_CHAT_URL}
                 target="_blank"

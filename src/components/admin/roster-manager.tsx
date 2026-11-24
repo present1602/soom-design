@@ -525,6 +525,8 @@ function OpenLog({ opens }: { opens: RosterOpenRow[] }) {
 function DesignerSection({ designers, options }: { designers: RosterDesignerRow[]; options: DesignerOption[] }) {
   const [adding, setAdding] = useState(false)
   const [editing, setEditing] = useState<string | null>(null)
+  /* 경력 글을 펼쳐 둔 디자이너 — 한 번에 한 명만. 다른 사람 걸 누르면 앞사람 건 닫힌다. */
+  const [expanded, setExpanded] = useState<string | null>(null)
   const [notice, setNotice] = useState<Notice>(null)
   const [pending, start] = useActionTransition()
   const router = useRouter()
@@ -604,6 +606,8 @@ function DesignerSection({ designers, options }: { designers: RosterDesignerRow[
                 first={i === 0}
                 last={i === designers.length - 1}
                 busy={pending}
+                open={expanded === d.id}
+                onToggle={() => setExpanded((cur) => (cur === d.id ? null : d.id))}
                 onUp={() => move(i, -1)}
                 onDown={() => move(i, 1)}
                 onEdit={() => {
@@ -635,6 +639,8 @@ function DesignerItem({
   first,
   last,
   busy,
+  open,
+  onToggle,
   onUp,
   onDown,
   onEdit,
@@ -645,6 +651,8 @@ function DesignerItem({
   first: boolean
   last: boolean
   busy: boolean
+  open: boolean
+  onToggle: () => void
   onUp: () => void
   onDown: () => void
   onEdit: () => void
@@ -684,9 +692,30 @@ function DesignerItem({
           )}
         </div>
         {d.career ? (
-          <p className="mt-1.5 line-clamp-3 whitespace-pre-wrap text-sm leading-relaxed text-neutral-600">
-            <CareerText text={d.career} linkClassName="text-violet-700 underline underline-offset-2" />
-          </p>
+          /* 글을 누르면 펼치고 다시 누르면 접는다. 안의 링크를 누를 땐 링크만 연다. */
+          <div
+            role="button"
+            tabIndex={0}
+            aria-expanded={open}
+            title={open ? '눌러서 접기' : '눌러서 전체 보기'}
+            onClick={(e) => {
+              if ((e.target as HTMLElement).closest('a')) return
+              onToggle()
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                onToggle()
+              }
+            }}
+            className="-mx-1.5 mt-1 cursor-pointer rounded-md px-1.5 py-0.5 hover:bg-neutral-50"
+          >
+            <p
+              className={`whitespace-pre-wrap text-sm leading-relaxed text-neutral-600 ${open ? '' : 'line-clamp-3'}`}
+            >
+              <CareerText text={d.career} linkClassName="text-violet-700 underline underline-offset-2" />
+            </p>
+          </div>
         ) : (
           <p className="mt-1.5 text-sm text-neutral-400">경력 내용이 비어 있습니다.</p>
         )}
